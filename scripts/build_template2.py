@@ -72,18 +72,10 @@ TPL2 = '''<!DOCTYPE html>
   .preview .msgtext img.apple-emoji { height: 34px; vertical-align: -7px; }
   .preview .msgtime { float: right; color: #8D8D8F; font-size: 17px;
         line-height: 20px; margin: 11px -2px -5px 12px; white-space: nowrap; }
-  .menu { position: relative; width: 457px; border-radius: 16px; overflow: hidden;
-        background: linear-gradient(160deg, rgba(255,255,255,0.16), rgba(255,255,255,0.055) 42%, rgba(255,255,255,0.09));
-        box-shadow: 0 22px 60px rgba(0, 0, 0, 0.5),
-                    inset 0 0 0 1px rgba(255, 255, 255, 0.3),
-                    inset 0 1.5px 0.5px rgba(255, 255, 255, 0.55),
-                    inset 0 -1px 1px rgba(255, 255, 255, 0.12);
-        backdrop-filter: blur(4px) saturate(1.7) brightness(1.14);
-        -webkit-backdrop-filter: blur(4px) saturate(1.7) brightness(1.14); }
-  .menu::before { content: ''; position: absolute; inset: 0; pointer-events: none;
-        background: radial-gradient(130% 65% at 16% 0%, rgba(255,255,255,0.16), rgba(255,255,255,0.04) 45%, transparent 72%); }
-  .menu .row { text-shadow: 0 1px 3px rgba(0, 0, 0, 0.28); }
-  .menu > * { position: relative; }
+  .menu { width: 457px; background: rgba(49, 49, 49, 0.9); border-radius: 14px;
+        overflow: hidden; box-shadow: 0 22px 60px rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(24px) saturate(1.4);
+        -webkit-backdrop-filter: blur(24px) saturate(1.4); }
   .menu .row { height: 77.5px; display: flex; align-items: center;
         justify-content: space-between; padding: 0 18px 0 27px;
         font-size: 28px; color: #E8E7E5; }
@@ -101,15 +93,8 @@ TPL2 = '''<!DOCTYPE html>
   body.light .preview .sender { color: #C77800; }
   body.light .preview .msgtext { color: #0A0A0A; }
   body.light .preview .msgtime { color: #8E8E93; }
-  body.light .menu { background:
-        linear-gradient(160deg, rgba(255,255,255,0.5), rgba(255,255,255,0.22) 42%, rgba(255,255,255,0.32));
-        box-shadow: 0 22px 60px rgba(0, 0, 0, 0.28),
-                    inset 0 0 0 1px rgba(255, 255, 255, 0.95),
-                    inset 0 1.5px 0.5px rgba(255, 255, 255, 1),
-                    inset 0 -1px 1px rgba(255, 255, 255, 0.6);
-        backdrop-filter: blur(4px) saturate(1.6) brightness(1.06);
-        -webkit-backdrop-filter: blur(4px) saturate(1.6) brightness(1.06); }
-  body.light .menu .row { text-shadow: 0 1px 2px rgba(255, 255, 255, 0.45); }
+  body.light .menu { background: rgba(248, 248, 248, 0.94);
+        box-shadow: 0 22px 60px rgba(0, 0, 0, 0.28); }
   body.light .menu::before { background:
         radial-gradient(135% 70% at 16% 0%, rgba(255,255,255,0.6), rgba(255,255,255,0.22) 45%, transparent 70%); }
   body.light .menu .row { color: #101010; }
