@@ -204,6 +204,8 @@ async function renderJpg(html) {
              !!bg && bg.style.backgroundImage.length > 60 &&
              Array.prototype.every.call(imgs, function (i) { return i.complete; });
     }, { timeout: 20000 }).catch(() => {});
+    // tunggu font kustom (fraktur/CJK/dll) selesai dimuat sebelum dipotret
+    await page.evaluate(() => document.fonts.ready).catch(() => {});
     await new Promise((r) => setTimeout(r, 900)); // buffer render akhir + encode JPEG
 
     const buf = await page.screenshot({ type: 'jpeg', quality: 92, fullPage: false });
@@ -230,6 +232,7 @@ module.exports = async (req, res) => {
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.end(jpg);
   } catch (e) {
+    console.error('[iqc] render JPG gagal:', e && e.message);
     // gagal render -> kirim halaman HTML agar tautan tetap bisa dibuka
     try {
       const { pesan, seed } = bacaParams(req);

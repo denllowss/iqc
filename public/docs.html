@@ -253,7 +253,7 @@
           <td><code>pesan</code> <span class="req">WAJIB*</span></td>
           <td><span class="tipe">string</span></td>
           <td><code>see u, hopefully…</code></td>
-          <td>Isi bubble chat. Maks <b>1000</b> karakter. Mendukung emoji (otomatis jadi emoji Apple), baris baru (<code>%0A</code> → baris baru), dan <a href="#format-wa">format teks WhatsApp</a> (tebal, miring, coret, monospace, daftar, kutip). Karakter berbahaya otomatis di-escape (aman XSS).</td>
+          <td>Isi bubble chat. Maks <b>1000</b> karakter. Mendukung emoji (otomatis jadi emoji Apple), baris baru (<code>%0A</code> → baris baru), <a href="#format-wa">format teks WhatsApp</a> (tebal, miring, coret, monospace, daftar, kutip), <b>font Unicode keren</b> (𝔄𝔟𝔠, 𝓐𝓑𝓒, ⒶⒷⒸ, 🄰🄱🄲, ค๒ς, dll.) serta <b>100+ bahasa</b> (Arab, Ibrani, Jepang, Korea, Mandarin, Hindi, Thai, Tibet, dan lainnya). Karakter berbahaya otomatis di-escape (aman XSS).</td>
         </tr>
         <tr>
           <td><code>mode</code></td>
@@ -293,6 +293,7 @@
       </table>
     </div>
     <div class="note"><span class="ic">ℹ️</span><span>Catatan: karakter <code>*</code>, <code>_</code>, <code>~</code> yang berdiri sendiri (tanpa pasangan) tetap tampil apa adanya. Untuk URL, <code>&gt;</code> di-encode menjadi <code>%3E</code>.</span></div>
+    <div class="note"><span class="ic">✨</span><span>Teks dengan <b>font Unicode keren</b> (hasil generator font seperti 𝔄𝔟𝔠, 𝓐𝓑𝓒, ғᴀɴᴄʏ, ค๒ς) dan <b>huruf/emoji lain</b> dirender utuh — kotak huruf (🄰, Ⓐ, 🇦 tunggal) tetap tampil sebagai huruf, bukan emoji. Bendera negara (🇮🇩) dan emoji ber-<i>skin tone</i> tetap jadi emoji Apple.</span></div>
   </section>
 
   <!-- ================= CONTOH ================= -->
