@@ -16,11 +16,19 @@
     {
       "source": "/docs",
       "destination": "/docs.html"
+    },
+    {
+      "source": "/iqc2",
+      "destination": "/api/iqc?v2=1"
+    },
+    {
+      "source": "/iqc2/",
+      "destination": "/api/iqc?v2=1"
     }
   ],
   "functions": {
     "api/iqc.js": {
-      "includeFiles": "_template.html",
+      "includeFiles": "_template*.html",
       "memory": 2048,
       "maxDuration": 60
     }

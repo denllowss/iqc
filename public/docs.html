@@ -232,6 +232,8 @@
 
     <div class="ep"><span class="method">GET</span><code>/api/iqc?pesan=...</code><span class="tag">alias langsung</span></div>
     <div class="card">
+      <h3 style="margin:18px 0 2px; font-size:15px"> Menu konteks WhatsApp (v2)</h3>
+      <p class="desc" style="margin-bottom:6px"><code>/iqc2?pesan=...</code> — replika <b>menu konteks/tapback WhatsApp iOS</b>: kartu preview pesan + 7 menu (Beri Bintang, Balas, Teruskan, Salin, Balas Secara Pribadi, Chat dengan …, Hapus). Latar <b>ruangan blur tetap</b> (bukan acak), <b>baterai tetap acak</b> 30–100% (deterministik bila <code>seed</code>), jam <b>WIB</b>. Nama pengirim diubah lewat <code>&amp;name=asep</code> (default <i>Jidar</i>). Parameter <code>pesan</code>, <code>mode</code>, <code>html</code>, dan format teks WhatsApp sama seperti versi 1.</p>
       <h3>Endpoint function asli</h3>
       <p>Perilaku sama persis dengan <code>/iqc</code> (tanpa rewrite). Berguna bila rewrite
          dimatikan atau untuk debugging.</p>
@@ -266,6 +268,12 @@
           <td><span class="tipe">integer</span></td>
           <td>acak</td>
           <td>Kunci wallpaper &amp; level baterai (30–100%). Seed sama → hasil identik (deterministik). Tanpa <code>seed</code>, tiap request menghasilkan wallpaper berbeda.</td>
+        </tr>
+        <tr>
+          <td><code>name</code> <span class="tipe">v2</span></td>
+          <td><span class="tipe">string</span></td>
+          <td><code>Jidar</code></td>
+          <td>Nama pengirim pada kartu preview <b>/iqc2</b> (maks 30 karakter), contoh <code>&amp;name=asep</code>.</td>
         </tr>
         <tr>
           <td><code>html</code></td>

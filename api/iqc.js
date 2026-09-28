@@ -138,6 +138,12 @@ function waToHtml(raw) {
   return html.replace(/\u0002(\d+)\u0002/g, function (m, i) { return codeBlocks[+i]; });
 }
 
+let tpl2Cache = null;
+function getTemplate2() {
+  if (!tpl2Cache) tpl2Cache = fs.readFileSync(path.join(__dirname, '_template2.html'), 'utf8');
+  return tpl2Cache;
+}
+
 function bacaParams(req) {
   const url = new URL(req.url, 'http://x'); // host diabaikan; path+query saja
   let pesan = (url.searchParams.get('pesan') || '').trim();
@@ -149,7 +155,11 @@ function bacaParams(req) {
   const htmlMode = ['1', 'true'].includes((url.searchParams.get('html') || '').toLowerCase());
   const modeQ = (url.searchParams.get('mode') || '').toLowerCase();
   const mode = modeQ === 'dark' ? 'dark' : modeQ === 'light' ? 'light' : null;
-  return { pesan, seed, htmlMode, mode };
+  let nama = (url.searchParams.get('name') || '').replace(/[\u0000-\u001F]/g, '').trim().slice(0, 30);
+  if (!nama) nama = 'Jidar';
+  const isV2 = url.searchParams.get('v2') === '1' ||
+               url.pathname.replace(/\/+$/, '').endsWith('/iqc2');
+  return { pesan, seed, htmlMode, mode, nama, isV2 };
 }
 
 function buildHtml(pesan, seed, mode) {
@@ -163,6 +173,27 @@ function buildHtml(pesan, seed, mode) {
     '<body><script>window.__SEED=' + seed + ';' +
     (mode ? 'window.__MODE="' + mode + '";' : '') + '</script>');
   return html;
+}
+
+/* v2: replika menu konteks WhatsApp — nama bisa &name=, latar TETAP,
+   baterai acak 30-100 (deterministik bila &seed=), jam WIB */
+function buildHtml2(pesan, nama, seed) {
+  const pesanHtml = waToHtml(pesan);
+  const pesanText = esc(pesan).replace(/\s*[\r\n]+\s*/g, ' ').trim();
+  // baterai acak 30-100; seed sama -> baterai sama
+  let t = seed >>> 0;
+  t = (t + 0x6D2B79F5) | 0;
+  let r = Math.imul(t ^ (t >>> 15), 1 | t);
+  r = (r + Math.imul(r ^ (r >>> 7), 61 | r)) ^ r;
+  const batt = 30 + (((r ^ (r >>> 14)) >>> 0) % 71);
+  const warna = batt <= 60 ? '#F7CE46' : '#FFFFFF'; // kuning = mode hemat daya
+  return getTemplate2()
+    .split('__NAMA__').join(esc(nama))
+    .split('__PESAN_HTML__').join(pesanHtml)
+    .split('__PESAN_TEXT__').join(pesanText)
+    .split('__BATERAI__').join(String(batt))
+    .split('__BATTF__').join(String(batt / 100))
+    .split('__BATTCOLOR__').join(warna);
 }
 
 function kirimHtml(res, html, cacheTime) {
@@ -217,8 +248,9 @@ async function renderJpg(html) {
 
 module.exports = async (req, res) => {
   try {
-    const { pesan, seed, htmlMode, mode } = bacaParams(req);
-    const html = buildHtml(pesan, seed, mode);
+    const { pesan, seed, htmlMode, mode, nama, isV2 } = bacaParams(req);
+    const html = isV2 ? buildHtml2(pesan, nama, seed)
+                      : buildHtml(pesan, seed, mode);
 
     // mode halaman interaktif
     if (htmlMode) return kirimHtml(res, html, 0);
@@ -235,8 +267,9 @@ module.exports = async (req, res) => {
     console.error('[iqc] render JPG gagal:', e && e.message);
     // gagal render -> kirim halaman HTML agar tautan tetap bisa dibuka
     try {
-      const { pesan, seed } = bacaParams(req);
-      return kirimHtml(res, buildHtml(pesan, seed), 0);
+      const { pesan, seed, nama, isV2 } = bacaParams(req);
+      return kirimHtml(res, isV2 ? buildHtml2(pesan, nama, seed)
+                                 : buildHtml(pesan, seed), 0);
     } catch (e2) {
       res.statusCode = 500;
       res.setHeader('Content-Type', 'text/plain; charset=utf-8');
