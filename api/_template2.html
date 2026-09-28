@@ -980,11 +980,11 @@
       g.globalAlpha = 1;
     }
 
-    /* buramkan secukupnya (12px) — bubble tetap jelas terlihat */
+    /* buramkan ringan (4px) — bubble tetap jelas terlihat */
     var fin = document.createElement('canvas');
     fin.width = W; fin.height = H;
     var fc = fin.getContext('2d');
-    fc.filter = 'blur(12px)';
+    fc.filter = 'blur(4px)';
     fc.drawImage(off, 0, 0);
     fc.filter = 'none';
     var url = fin.toDataURL('image/jpeg', 0.9);

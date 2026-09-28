@@ -917,7 +917,7 @@
     var g = off.getContext('2d');
     var bgEl = document.querySelector('.bg');
     var backdropEl = document.querySelector('.backdrop');
-    var WALLPAPER_BLUR = 18; /* kekuatan blur latar (px) */
+    var WALLPAPER_BLUR = 4; /* kekuatan blur latar (px) — chat tetap terbaca */
 
     function rr(c, x, y, w, h, r) {
       r = Math.min(r, w / 2, h / 2);
@@ -1004,16 +1004,11 @@
         y += 18 + rnd() * 18;
       }
 
-      /* buramkan kuat agar terasa seperti screenshot IG asli */
+      /* buramkan ringan — percakapan tetap terlihat jelas */
       var fin = document.createElement('canvas'); fin.width = W; fin.height = H;
       var fc = fin.getContext('2d');
-      var small = document.createElement('canvas');
-      small.width = W >> 3; small.height = H >> 3;
-      small.getContext('2d').drawImage(off, 0, 0, small.width, small.height);
-      fc.imageSmoothingEnabled = true; fc.imageSmoothingQuality = 'high';
-      fc.drawImage(small, 0, 0, W, H);
       fc.filter = 'blur(' + WALLPAPER_BLUR + 'px)';
-      fc.drawImage(fin, 0, 0);
+      fc.drawImage(off, 0, 0);
       fc.filter = 'none';
       var url = fin.toDataURL('image/jpeg', 0.9);
       if (bgEl) bgEl.style.backgroundImage = 'url("' + url + '")';

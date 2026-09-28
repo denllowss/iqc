@@ -342,6 +342,25 @@ r.raise_for_status()
     <div class="codeblock"><span class="lang">html</span><button class="copy">Salin</button>
 <pre>&lt;<span class="u">img</span> src=<span class="s">"https://DOMAIN/iqc?pesan=halo%E2%9D%A4&amp;mode=dark&amp;seed=7"</span>
      alt=<span class="s">"kartu ucapan"</span> width=<span class="s">"405"</span>&gt;</pre></div>
+
+    <h3 style="margin:24px 0 2px; font-size:15px"> Menu konteks WhatsApp — v2 <code>/iqc2</code></h3>
+    <p class="desc" style="font-size:13.5px">Versi kedua: replika <b>tapback/menu konteks WhatsApp iOS</b> — kartu pesan + 7 menu (Beri Bintang, Balas, Teruskan, Salin, Balas Secara Pribadi, Chat dengan …, Hapus) di atas latar chat WhatsApp gelap yang diburamkan ringan. Hasil juga <b>selalu foto JPEG</b>.</p>
+    <div class="codeblock"><span class="lang">url</span><button class="copy">Salin</button>
+<pre>/iqc2?pesan=ya Allah dadaku ngik ngik kaya knalpot astrea
+/iqc2?pesan=besok jalan&name=asep
+/iqc2?pesan=met pagi&#127881;&mode=dark&seed=77</pre></div>
+    <div class="card scroll">
+      <table>
+        <tr><th>Parameter</th><th>Keterangan</th></tr>
+        <tr><td><code>pesan</code></td><td>Isi kartu pesan (mendukung format WA, emoji, font Unicode) — sama seperti v1.</td></tr>
+        <tr><td><code>name</code></td><td>Nama pengirim di kartu &amp; menu "Chat dengan …". Default <i>Jidar</i>, maks 30 karakter, contoh <code>&amp;name=asep</code>.</td></tr>
+        <tr><td><code>mode</code></td><td><code>dark</code> / <code>light</code> — mengubah warna kartu, menu &amp; status bar.</td></tr>
+        <tr><td><code>seed</code></td><td>Mengunci level baterai (30–100%). Latar <b>tidak</b> dipengaruhi seed — selalu percakapan WhatsApp yang sama.</td></tr>
+      </table>
+    </div>
+    <div class="codeblock"><span class="lang">curl</span><button class="copy">Salin</button>
+<pre>curl -o kartu.jpg "https://DOMAIN/iqc2?pesan=met%20pagi%F0%9F%8E%89&amp;name=asep"</pre></div>
+    <div class="note"><span class="ic">ℹ️</span><span>Beda dengan v1: v2 memakai nama pengirim (<code>name</code>), latar WhatsApp gelap yang tetap, dan baterai tetap acak. Keduanya sama-sama mengembalikan foto.</span></div>
   </section>
 
   <!-- ================= RESPONS ================= -->
