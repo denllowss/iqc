@@ -6,7 +6,7 @@
   ],
   "functions": {
     "api/iqc.js": {
-      "includeFiles": ["api/_template.html"],
+      "includeFiles": "api/_template.html",
       "memory": 3009,
       "maxDuration": 60
     }
