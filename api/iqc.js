@@ -32,6 +32,24 @@ function getTemplate() {
   throw new Error('template _template.html tidak ditemukan');
 }
 
+/* Gabung template dalam SATU lintas: template dipecah sekali (cache),
+   lalu tiap request hanya menjahit nilai — hemat ~200ms di template v2. */
+const segCache = {};
+function segs(key, tpl) {
+  if (!segCache[key]) {
+    segCache[key] = tpl.split(/__(NAMA|PESAN_HTML|PESAN_TEXT|BATERAI|BATTF|BATTCOLOR)__/);
+  }
+  return segCache[key];
+}
+function gabung(arr, vals) {
+  let out = '';
+  for (let i = 0; i < arr.length; i++) {
+    if (i & 1) { const v = vals[arr[i]]; out += v === undefined ? '' : v; }
+    else out += arr[i];
+  }
+  return out;
+}
+
 function esc(s) {
   return s
     .replace(/&/g, '&amp;')
@@ -164,14 +182,12 @@ function bacaParams(req) {
 function buildHtml(pesan, seed, mode) {
   const pesanHtml = waToHtml(pesan);                                  // bubble (format WA)
   const pesanText = esc(pesan).replace(/\s*[\r\n]+\s*/g, ' ').trim(); // og:description (teks polos)
-  let html = getTemplate()
-    .split('__PESAN_HTML__').join(pesanHtml)
-    .split('__PESAN_TEXT__').join(pesanText);
   // injeksi seed + mode agar hasil deterministik saat dirender headless
-  html = html.replace('<body>',
-    '<body><script>window.__SEED=' + seed + ';' +
-    (mode ? 'window.__MODE="' + mode + '";' : '') + '</script>');
-  return html;
+  const inj = '<script>window.__SEED=' + seed + ';' +
+    (mode ? 'window.__MODE="' + mode + '";' : '') + '</script>';
+  return gabung(segs('v1', getTemplate()),
+                { PESAN_HTML: pesanHtml, PESAN_TEXT: pesanText })
+    .replace('<body>', '<body>' + inj);
 }
 
 /* v2: replika menu konteks WhatsApp — nama bisa &name=, latar TETAP,
@@ -186,38 +202,52 @@ function buildHtml2(pesan, nama, seed, mode) {
   r = (r + Math.imul(r ^ (r >>> 7), 61 | r)) ^ r;
   const batt = 30 + (((r ^ (r >>> 14)) >>> 0) % 71);
   const warna = batt <= 60 ? '#F7CE46' : '#FFFFFF'; // kuning = mode hemat daya
-  let html = getTemplate2()
-    .split('__NAMA__').join(esc(nama))
-    .split('__PESAN_HTML__').join(pesanHtml)
-    .split('__PESAN_TEXT__').join(pesanText)
-    .split('__BATERAI__').join(String(batt))
-    .split('__BATTF__').join(String(batt / 100))
-    .split('__BATTCOLOR__').join(warna);
   // tema light/dark (default dark, sesuai referensi WA iOS)
-  return html.replace('<body>',
-    '<body><script>' + (mode ? 'window.__MODE="' + mode + '";' : '') + '</script>');
+  const inj = '<script>' + (mode ? 'window.__MODE="' + mode + '";' : '') + '</script>';
+  return gabung(segs('v2', getTemplate2()), {
+    NAMA: esc(nama),
+    PESAN_HTML: pesanHtml,
+    PESAN_TEXT: pesanText,
+    BATERAI: String(batt),
+    BATTF: String(batt / 100),
+    BATTCOLOR: warna,
+  }).replace('<body>', '<body>' + inj);
 }
 
-/* ---------- render JPG via headless Chromium ---------- */
+/* ---------- render JPG via headless Chromium ----------
+   Cepat: 1 browser hangat dipakai ulang antar request (launch hanya saat
+   cold start / crash), tunggu 'load' + sinyal eksplisit, tanpa tidur panjang. */
 let chromiumMod = null, puppeteerMod = null;
+let browserPromise = null;   // promise browser yang dipakai bersama
+
+function getBrowser() {
+  if (!browserPromise) {
+    browserPromise = (async () => {
+      if (!chromiumMod) chromiumMod = require('@sparticuz/chromium');
+      if (!puppeteerMod) puppeteerMod = require('puppeteer-core');
+      const chromium = chromiumMod;
+      const puppeteer = puppeteerMod;
+      return puppeteer.launch({
+        args: [...chromium.args, '--force-device-scale-factor=' + SCALE,
+               '--disable-component-update', '--disable-sync',
+               '--disable-features=Translate'],
+        executablePath: await chromium.executablePath(),
+        headless: chromium.headless,
+        defaultViewport: { width: W, height: H, deviceScaleFactor: SCALE },
+      });
+    })().catch((e) => { browserPromise = null; throw e; });
+  }
+  return browserPromise;
+}
+
 async function renderJpg(html) {
-  if (!chromiumMod) chromiumMod = require('@sparticuz/chromium');
-  if (!puppeteerMod) puppeteerMod = require('puppeteer-core');
-
-  const chromium = chromiumMod;
-  const puppeteer = puppeteerMod;
-
-  const browser = await puppeteer.launch({
-    args: [...chromium.args, '--force-device-scale-factor=' + SCALE],
-    executablePath: await chromium.executablePath(),
-    headless: chromium.headless,
-    defaultViewport: { width: W, height: H, deviceScaleFactor: SCALE },
-  });
-
+  const browser = await getBrowser();
+  let page;
   try {
-    const page = await browser.newPage();
-    // muat halaman; tunggu jaringan selesai (emoji CDN) — kalau timeout lanjut saja
-    await page.setContent(html, { waitUntil: 'networkidle0', timeout: 30000 })
+    page = await browser.newPage();
+
+    // muat dokumen; emoji CDN ditunggu lewat waitForFunction di bawah
+    await page.setContent(html, { waitUntil: 'load', timeout: 30000 })
       .catch(() => {});
     // pastikan wallpaper final (render ulang setelah emoji termuat) & emoji bubble siap
     await page.waitForFunction(() => {
@@ -226,17 +256,30 @@ async function renderJpg(html) {
       return window.__wpDone === true &&
              !!bg && bg.style.backgroundImage.length > 60 &&
              Array.prototype.every.call(imgs, function (i) { return i.complete; });
-    }, { timeout: 20000 }).catch(() => {});
-    // tunggu font kustom (fraktur/CJK/dll) selesai dimuat sebelum dipotret
-    await page.evaluate(() => document.fonts.ready).catch(() => {});
-    await new Promise((r) => setTimeout(r, 900)); // buffer render akhir + encode JPEG
+    }, { polling: 120, timeout: 20000 }).catch(() => {});
+    // font kustom (fraktur/CJK/dll) — dibatasi 4 dtk agar tak menggantung
+    await Promise.race([
+      page.evaluate(() => document.fonts.ready),
+      new Promise((r) => setTimeout(r, 4000)),
+    ]).catch(() => {});
+    await new Promise((r) => setTimeout(r, 250)); // buffer singkat paint akhir
 
-    const buf = await page.screenshot({ type: 'jpeg', quality: 92, fullPage: false });
-    return buf;
+    return await page.screenshot({ type: 'jpeg', quality: 90, fullPage: false });
+  } catch (e) {
+    // browser/tab mati (crash, OOM) -> buang instance hangat, request berikutnya launch baru
+    const msg = String((e && e.message) || e);
+    if (/Target closed|Session closed|Browser has been closed|detached|Disconnect/i.test(msg)) {
+      browserPromise = null;
+      try { await browser.close(); } catch (_) {}
+    }
+    throw e;
   } finally {
-    await browser.close().catch(() => {});
+    if (page) await page.close().catch(() => {});
   }
 }
+
+// pemanasan: saat cold start, browser langsung disiapkan di latar belakang
+getBrowser().catch(() => {});
 
 /* Foto "gagal membuat gambar" — dikirim bila render gagal total,
    supaya hasil endpoint SELALU berbentuk foto. */
