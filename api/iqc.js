@@ -176,7 +176,7 @@ function buildHtml(pesan, seed, mode) {
 
 /* v2: replika menu konteks WhatsApp — nama bisa &name=, latar TETAP,
    baterai acak 30-100 (deterministik bila &seed=), jam WIB */
-function buildHtml2(pesan, nama, seed) {
+function buildHtml2(pesan, nama, seed, mode) {
   const pesanHtml = waToHtml(pesan);
   const pesanText = esc(pesan).replace(/\s*[\r\n]+\s*/g, ' ').trim();
   // baterai acak 30-100; seed sama -> baterai sama
@@ -186,13 +186,16 @@ function buildHtml2(pesan, nama, seed) {
   r = (r + Math.imul(r ^ (r >>> 7), 61 | r)) ^ r;
   const batt = 30 + (((r ^ (r >>> 14)) >>> 0) % 71);
   const warna = batt <= 60 ? '#F7CE46' : '#FFFFFF'; // kuning = mode hemat daya
-  return getTemplate2()
+  let html = getTemplate2()
     .split('__NAMA__').join(esc(nama))
     .split('__PESAN_HTML__').join(pesanHtml)
     .split('__PESAN_TEXT__').join(pesanText)
     .split('__BATERAI__').join(String(batt))
     .split('__BATTF__').join(String(batt / 100))
     .split('__BATTCOLOR__').join(warna);
+  // tema light/dark (default dark, sesuai referensi WA iOS)
+  return html.replace('<body>',
+    '<body><script>' + (mode ? 'window.__MODE="' + mode + '";' : '') + '</script>');
 }
 
 /* ---------- render JPG via headless Chromium ---------- */
@@ -253,7 +256,7 @@ function kirimJpg(res, jpg, status) {
 
 async function renderSelaluFoto(req, res) {
   const { pesan, seed, mode, nama, isV2 } = bacaParams(req);
-  const html = isV2 ? buildHtml2(pesan, nama, seed)
+  const html = isV2 ? buildHtml2(pesan, nama, seed, mode)
                     : buildHtml(pesan, seed, mode);
   const jpg = await renderJpg(html);
   kirimJpg(res, jpg, 200);

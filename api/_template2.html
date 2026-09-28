@@ -804,6 +804,31 @@
   .menu .row + .row { border-top: 1px solid rgba(255, 255, 255, 0.07); }
   .menu .row svg { position: static; width: 29px; height: 29px; flex: none; }
   .menu .row.del { color: #E2554F; }
+  /* ====== Tema terang (mode=light) ====== */
+  body.light .backdrop { filter: blur(30px) brightness(1.02) saturate(0.95); }
+  body.light .sb, body.light .sb .carrier, body.light .sb .time,
+  body.light .sb .sright { color: #0A0A0A; }
+  body.light .batt .case { border-color: #0A0A0A; }
+  body.light .batt .lvl, body.light .batt .nub { background: #0A0A0A; }
+  body.light .preview { background: rgba(250, 250, 250, 0.97);
+        box-shadow: 0 18px 45px rgba(0, 0, 0, 0.25); }
+  body.light .preview .sender { color: #C77800; }
+  body.light .preview .msgtext { color: #0A0A0A; }
+  body.light .preview .msgtime { color: #8E8E93; }
+  body.light .menu { background:
+        linear-gradient(155deg, rgba(255,255,255,0.62), rgba(255,255,255,0.34) 38%, rgba(255,255,255,0.16)),
+        rgba(250, 250, 250, 0.5);
+        box-shadow: 0 22px 60px rgba(0, 0, 0, 0.28),
+                    inset 0 0 0 1px rgba(255, 255, 255, 0.9),
+                    inset 0 1.5px 0.5px rgba(255, 255, 255, 0.95),
+                    inset 0 -10px 24px rgba(255, 255, 255, 0.45);
+        backdrop-filter: blur(32px) saturate(1.8) brightness(1.05);
+        -webkit-backdrop-filter: blur(32px) saturate(1.8) brightness(1.05); }
+  body.light .menu::before { background:
+        radial-gradient(135% 70% at 16% 0%, rgba(255,255,255,0.6), rgba(255,255,255,0.22) 45%, transparent 70%); }
+  body.light .menu .row { color: #101010; }
+  body.light .menu .row + .row { border-top-color: rgba(0, 0, 0, 0.08); }
+  body.light .menu .row.del { color: #E2554F; }
 </style>
 </head>
 <body>
@@ -813,13 +838,13 @@
 
   <div class="sb">
     <div class="carrier">
-      <svg viewBox="0 0 22 15" fill="#fff"><rect x="0" y="10" width="3.5" height="5" rx="1"/><rect x="5.5" y="7.2" width="3.5" height="7.8" rx="1"/><rect x="11" y="4.2" width="3.5" height="10.8" rx="1"/><rect x="16.5" y="1" width="3.5" height="14" rx="1"/></svg>
+      <svg viewBox="0 0 22 15" fill="currentColor"><rect x="0" y="10" width="3.5" height="5" rx="1"/><rect x="5.5" y="7.2" width="3.5" height="7.8" rx="1"/><rect x="11" y="4.2" width="3.5" height="10.8" rx="1"/><rect x="16.5" y="1" width="3.5" height="14" rx="1"/></svg>
       <span>XL Axiata LTE</span>
     </div>
     <div class="time"></div>
     <div class="sright">
-      <svg class="ic" viewBox="0 0 17 17" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round"><circle cx="8.5" cy="8.8" r="5.9"/><path d="M8.5 5.8v3.2l2.1 1.3"/><path d="M3.9 2.6L2.7 3.9M13.1 2.6l1.2 1.3"/></svg>
-      <svg class="ic" viewBox="0 0 18 17" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round"><path d="M3.2 12.5v-3a5.8 5.8 0 0 1 11.6 0v3"/><rect x="1.8" y="10.6" width="3.5" height="5.2" rx="1.7"/><rect x="12.7" y="10.6" width="3.5" height="5.2" rx="1.7"/></svg>
+      <svg class="ic" viewBox="0 0 17 17" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="8.5" cy="8.8" r="5.9"/><path d="M8.5 5.8v3.2l2.1 1.3"/><path d="M3.9 2.6L2.7 3.9M13.1 2.6l1.2 1.3"/></svg>
+      <svg class="ic" viewBox="0 0 18 17" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M3.2 12.5v-3a5.8 5.8 0 0 1 11.6 0v3"/><rect x="1.8" y="10.6" width="3.5" height="5.2" rx="1.7"/><rect x="12.7" y="10.6" width="3.5" height="5.2" rx="1.7"/></svg>
       <span>__BATERAI__%</span>
       <div class="batt"><div class="case"></div><div class="lvl" style="width: calc((100% - 3.6px) * __BATTF__ + 0px);"></div><div class="nub"></div></div>
     </div>
@@ -831,12 +856,12 @@
       <div class="msgtext" id="msg">__PESAN_HTML__<span class="msgtime waktupesan"></span></div>
     </div>
     <div class="menu">
-      <div class="row"><span>Beri Bintang</span><svg viewBox="0 0 24 24" fill="none" stroke="#E8E7E5" stroke-width="1.7" stroke-linejoin="round"><path d="M12 3.2l2.7 5.6 6.1.8-4.5 4.3 1.1 6-5.4-2.9-5.4 2.9 1.1-6L3.2 9.6l6.1-.8z"/></svg></div>
-      <div class="row"><span>Balas</span><svg viewBox="0 0 24 24" fill="none" stroke="#E8E7E5" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 5.5L4 11l5.5 5.5"/><path d="M4 11h10a6 6 0 0 1 6 6v1.5"/></svg></div>
-      <div class="row"><span>Teruskan</span><svg viewBox="0 0 24 24" fill="none" stroke="#E8E7E5" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 5.5L20 11l-5.5 5.5"/><path d="M20 11H10a6 6 0 0 0-6 6v1.5"/></svg></div>
-      <div class="row"><span>Salin</span><svg viewBox="0 0 24 24" fill="none" stroke="#E8E7E5" stroke-width="1.8" stroke-linejoin="round"><rect x="8.5" y="8.5" width="12" height="12" rx="2.5"/><path d="M15.5 8.5V6a2.5 2.5 0 0 0-2.5-2.5H6A2.5 2.5 0 0 0 3.5 6v7A2.5 2.5 0 0 0 6 15.5h2.5"/></svg></div>
-      <div class="row"><span>Balas Secara Pribadi</span><svg viewBox="0 0 24 24" fill="none" stroke="#E8E7E5" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 5.5L4 11l5.5 5.5"/><path d="M4 11h10a6 6 0 0 1 6 6v1.5"/></svg></div>
-      <div class="row"><span>Chat dengan __NAMA__</span><svg viewBox="0 0 24 24" fill="none" stroke="#E8E7E5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5c5 0 8.5 3.4 8.5 7.7S17 18.9 12 18.9c-1 0-2-.1-2.9-.4L4 20.5l1.6-4A7.6 7.6 0 0 1 3.5 11.2C3.5 6.9 7 3.5 12 3.5z"/></svg></div>
+      <div class="row"><span>Beri Bintang</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M12 3.2l2.7 5.6 6.1.8-4.5 4.3 1.1 6-5.4-2.9-5.4 2.9 1.1-6L3.2 9.6l6.1-.8z"/></svg></div>
+      <div class="row"><span>Balas</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 5.5L4 11l5.5 5.5"/><path d="M4 11h10a6 6 0 0 1 6 6v1.5"/></svg></div>
+      <div class="row"><span>Teruskan</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 5.5L20 11l-5.5 5.5"/><path d="M20 11H10a6 6 0 0 0-6 6v1.5"/></svg></div>
+      <div class="row"><span>Salin</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="8.5" y="8.5" width="12" height="12" rx="2.5"/><path d="M15.5 8.5V6a2.5 2.5 0 0 0-2.5-2.5H6A2.5 2.5 0 0 0 3.5 6v7A2.5 2.5 0 0 0 6 15.5h2.5"/></svg></div>
+      <div class="row"><span>Balas Secara Pribadi</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 5.5L4 11l5.5 5.5"/><path d="M4 11h10a6 6 0 0 1 6 6v1.5"/></svg></div>
+      <div class="row"><span>Chat dengan __NAMA__</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5c5 0 8.5 3.4 8.5 7.7S17 18.9 12 18.9c-1 0-2-.1-2.9-.4L4 20.5l1.6-4A7.6 7.6 0 0 1 3.5 11.2C3.5 6.9 7 3.5 12 3.5z"/></svg></div>
       <div class="row del"><span>Hapus</span><svg viewBox="0 0 24 24" fill="none" stroke="#E2554F" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6.5h16"/><path d="M9 6.5V4.8A1.8 1.8 0 0 1 10.8 3h2.4A1.8 1.8 0 0 1 15 4.8v1.7"/><path d="M6 6.5l1 12.2A2 2 0 0 0 9 20.5h6a2 2 0 0 0 2-1.8l1-12.2"/><path d="M10 10.5v6M14 10.5v6"/></svg></div>
     </div>
   </div>
@@ -874,6 +899,7 @@
     }
   }
   var timeEl = document.querySelector('.time');
+  if (window.__MODE === 'light') document.body.classList.add('light');
   function tickClock() {
     var now = new Date();
     timeEl.textContent = wib(now);
@@ -895,16 +921,17 @@
       };
     }
     var rnd = mulberry32(0x57A17A); // tetap -> latar identik tiap muat
+    var LIGHT = (typeof window.__MODE === 'string' && window.__MODE === 'light');
     var W = 675, H = 1200;
     var off = document.createElement('canvas');
     off.width = W; off.height = H;
     var g = off.getContext('2d');
 
     /* dasar: kertas chat WA gelap + dinding samar */
-    g.fillStyle = '#0B141A'; g.fillRect(0, 0, W, H);
+    g.fillStyle = LIGHT ? '#ECE6DC' : '#0B141A'; g.fillRect(0, 0, W, H);
     var i, x, y;
     for (i = 0; i < 90; i++) { /* doodle samar ala WA */
-      g.fillStyle = 'rgba(222,232,238,0.028)';
+      g.fillStyle = LIGHT ? 'rgba(70,70,70,0.05)' : 'rgba(222,232,238,0.028)';
       x = rnd() * W; y = rnd() * H; var r = 5 + rnd() * 16;
       g.beginPath(); g.arc(x, y, r, 0, 7); g.fill();
     }
@@ -940,7 +967,7 @@
       g.beginPath(); g.moveTo(tx + 8, ty + 4); g.lineTo(tx + 12, ty + 8); g.lineTo(tx + 20, ty - 2); g.stroke();
     }
     /* pembatas tanggal berteks ala WA */
-    g.fillStyle = '#182229';
+    g.fillStyle = LIGHT ? '#FFFFFF' : '#182229';
     g.beginPath();
     g.moveTo((W - 210) / 2 + 12, 96);
     g.arcTo((W + 210) / 2, 96, (W + 210) / 2, 138, 12);
@@ -948,31 +975,33 @@
     g.arcTo((W - 210) / 2, 138, (W - 210) / 2, 96, 12);
     g.arcTo((W - 210) / 2, 96, (W + 210) / 2, 96, 12);
     g.closePath(); g.fill();
-    g.fillStyle = 'rgba(134,150,160,0.9)';
+    g.fillStyle = LIGHT ? 'rgba(75,75,75,0.8)' : 'rgba(134,150,160,0.9)';
     g.font = '600 19px sans-serif'; g.textAlign = 'center';
     g.fillText('28 Maret 2026', W / 2, 124);
     g.textAlign = 'left';
 
     /* header WA: avatar + nama + ikon video/telepon/dots */
-    g.fillStyle = '#202C33'; g.fillRect(0, 0, W, 108);
-    g.fillStyle = '#8696A0';                 /* panah kembali */
-    g.strokeStyle = '#AEBAC1'; g.lineWidth = 4; g.lineCap = 'round'; g.lineJoin = 'round';
+    g.fillStyle = LIGHT ? '#F3EEE6' : '#202C33'; g.fillRect(0, 0, W, 108);
+    g.fillStyle = LIGHT ? '#6E7B87' : '#8696A0';                 /* panah kembali */
+    g.strokeStyle = LIGHT ? '#6E7B87' : '#AEBAC1'; g.lineWidth = 4; g.lineCap = 'round'; g.lineJoin = 'round';
     g.beginPath(); g.moveTo(50, 38); g.lineTo(30, 56); g.lineTo(50, 74); g.stroke();
-    ling(112, 56, 33, '#6A7175');            /* avatar */
-    g.fillStyle = '#AEBAC1';
+    ling(112, 56, 33, LIGHT ? '#C9CFD6' : '#6A7175');            /* avatar */
+    g.fillStyle = LIGHT ? '#FDFDFD' : '#AEBAC1';
     g.beginPath(); g.arc(112, 48, 11, 0, 7); g.fill();          /* kepala */
     g.beginPath(); g.ellipse(112, 74, 17, 11, 0, 0, 7); g.fill(); /* badan */
-    g.fillStyle = '#E9EDEF';
+    g.fillStyle = LIGHT ? '#111B21' : '#E9EDEF';
     g.font = '600 26px sans-serif';
     g.fillText('Anna', 162, 66);
-    g.strokeStyle = '#AEBAC1'; g.lineWidth = 3.4;
+    g.strokeStyle = LIGHT ? '#6E7B87' : '#AEBAC1'; g.lineWidth = 3.4;
     rr(g, W - 220, 42, 44, 30, 8); g.stroke();                  /* video */
     g.beginPath(); g.moveTo(W - 176, 50); g.lineTo(W - 160, 41); g.lineTo(W - 160, 63); g.lineTo(W - 176, 54); g.closePath(); g.stroke();
     g.beginPath(); g.arc(W - 116, 57, 15, Math.PI * 0.4, Math.PI * 1.6, true); g.stroke(); /* telepon */
     g.beginPath(); g.moveTo(W - 130, 68); g.lineTo(W - 103, 68); g.stroke();
-    for (var dt = 0; dt < 3; dt++) ling(W - 58 + (dt - 1) * 11, 57, 2.8, '#AEBAC1'); /* dots */
+    for (var dt = 0; dt < 3; dt++) ling(W - 58 + (dt - 1) * 11, 57, 2.8, LIGHT ? '#6E7B87' : '#AEBAC1'); /* dots */
 
-    var IN = '#202C33', OUT = '#005C4B', TXT = 'rgba(233,237,239,0.85)', META = 'rgba(134,150,160,0.8)';
+    var IN = LIGHT ? '#FFFFFF' : '#202C33', OUT = LIGHT ? '#D9FDD3' : '#005C4B',
+        TXT = LIGHT ? 'rgba(19,32,42,0.78)' : 'rgba(233,237,239,0.85)',
+        META = LIGHT ? 'rgba(80,90,100,0.8)' : 'rgba(134,150,160,0.8)';
     y = 175;
     var turn = 0;
     while (y < 1120) {
@@ -982,21 +1011,21 @@
       if (tipe < 0.14) { /* foto */
         var bh = 130 + rnd() * 90;
         pill(kanan ? OUT : IN, kanan ? W - 44 - bw : 44, y, bw, bh, 16);
-        g.fillStyle = kanan ? 'rgba(11,20,26,0.35)' : '#2A3942';
+        g.fillStyle = kanan ? (LIGHT ? 'rgba(255,255,255,0.45)' : 'rgba(11,20,26,0.35)') : (LIGHT ? '#DAE2E7' : '#2A3942');
         g.beginPath();
         g.moveTo(kanan ? W - 44 - bw + 14 : 58, y + bh - 14);
         g.lineTo((kanan ? W - 44 - bw : 44) + bw * 0.45, y + 26);
         g.lineTo((kanan ? W - 44 - bw : 44) + bw * 0.8, y + bh - 14);
         g.closePath(); g.fill();
         g.beginPath(); g.arc((kanan ? W - 44 - bw : 44) + bw * 0.72, y + 38, 13, 0, 7);
-        g.fillStyle = 'rgba(233,237,239,0.5)'; g.fill();
+        g.fillStyle = LIGHT ? 'rgba(255,255,255,0.85)' : 'rgba(233,237,239,0.5)'; g.fill();
         y += bh;
       } else if (tipe < 0.26) { /* voice note */
         var bh2 = 66;
         pill(kanan ? OUT : IN, kanan ? W - 44 - 300 : 44, y, 300, bh2, 30);
-        g.fillStyle = 'rgba(233,237,239,0.55)';
+        g.fillStyle = LIGHT ? 'rgba(255,255,255,0.9)' : 'rgba(233,237,239,0.55)';
         g.beginPath(); g.arc((kanan ? W - 44 - 300 : 44) + 32, y + bh2 / 2, 12, 0, 7); g.fill();
-        g.fillStyle = kanan ? '#0B141A' : '#202C33';
+        g.fillStyle = kanan ? (LIGHT ? '#FFFFFF' : '#0B141A') : (LIGHT ? '#F0F4F6' : '#202C33');
         g.beginPath();
         var px0 = (kanan ? W - 44 - 300 : 44) + 32;
         g.moveTo(px0 - 4, y + bh2 / 2 - 7); g.lineTo(px0 + 9, y + bh2 / 2); g.lineTo(px0 - 4, y + bh2 / 2 + 7);
@@ -1004,7 +1033,7 @@
         for (var wv = 0; wv < 22; wv++) {
           var wh = 4 + rnd() * 18;
           line((kanan ? W - 44 - 300 : 44) + 58 + wv * 10.5, y + bh2 / 2 - wh / 2, 3.5, wh,
-               kanan ? 'rgba(11,20,26,0.5)' : 'rgba(134,150,160,0.55)');
+               kanan ? (LIGHT ? 'rgba(19,32,42,0.5)' : 'rgba(11,20,26,0.5)') : (LIGHT ? 'rgba(110,120,130,0.6)' : 'rgba(134,150,160,0.55)'));
         }
         y += bh2;
       } else { /* teks */
@@ -1016,7 +1045,7 @@
           line((kanan ? W - 44 - bw : 44) + 20, y + 18 + ln * 26, lw2, 9, TXT);
         }
         var bxw = kanan ? W - 44 - bw : 44;
-        g.fillStyle = kanan ? 'rgba(11,20,26,0.45)' : 'rgba(134,150,160,0.65)';
+        g.fillStyle = kanan ? (LIGHT ? 'rgba(19,32,42,0.5)' : 'rgba(11,20,26,0.45)') : (LIGHT ? 'rgba(110,120,130,0.7)' : 'rgba(134,150,160,0.65)');
         g.font = '400 14px sans-serif';
         var jam = String(9 + Math.floor(rnd() * 13)) + '.' + ('0' + Math.floor(rnd() * 59)).slice(-2);
         g.fillText(jam, kanan ? bxw + bw - 58 : bxw + 16, y + bh3 - 10);
@@ -1037,7 +1066,7 @@
 
     /* input bar WA: pill + smiley, klip, kamera, tombol mic hijau */
     var iy = H - 128;
-    pill('#202C33', 34, iy, W - 150, 84, 42);
+    pill(LIGHT ? '#FFFFFF' : '#202C33', 34, iy, W - 150, 84, 42);
     g.strokeStyle = '#8696A0'; g.lineWidth = 3.2;
     g.beginPath(); g.arc(78, iy + 40, 15, 0, 7); g.stroke();              /* smiley */
     g.beginPath(); g.arc(78, iy + 40, 16, Math.PI * 1.15, Math.PI * 1.85); g.stroke();
