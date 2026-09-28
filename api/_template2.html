@@ -787,16 +787,16 @@
   .preview .msgtime { float: right; color: #8D8D8F; font-size: 17px;
         line-height: 20px; margin: 11px -2px -5px 12px; white-space: nowrap; }
   .menu { position: relative; width: 457px; border-radius: 16px; overflow: hidden;
-        background: linear-gradient(155deg, rgba(255,255,255,0.11), rgba(255,255,255,0.035) 38%, rgba(0,0,0,0.055)),
-                    rgba(56, 58, 60, 0.38);
+        background: linear-gradient(160deg, rgba(255,255,255,0.16), rgba(255,255,255,0.055) 42%, rgba(255,255,255,0.09));
         box-shadow: 0 22px 60px rgba(0, 0, 0, 0.5),
-                    inset 0 0 0 1px rgba(255, 255, 255, 0.15),
-                    inset 0 1.5px 0.5px rgba(255, 255, 255, 0.3),
-                    inset 0 -10px 24px rgba(255, 255, 255, 0.045);
-        backdrop-filter: blur(32px) saturate(1.9) brightness(1.07);
-        -webkit-backdrop-filter: blur(32px) saturate(1.9) brightness(1.07); }
+                    inset 0 0 0 1px rgba(255, 255, 255, 0.3),
+                    inset 0 1.5px 0.5px rgba(255, 255, 255, 0.55),
+                    inset 0 -1px 1px rgba(255, 255, 255, 0.12);
+        backdrop-filter: blur(4px) saturate(1.7) brightness(1.14);
+        -webkit-backdrop-filter: blur(4px) saturate(1.7) brightness(1.14); }
   .menu::before { content: ''; position: absolute; inset: 0; pointer-events: none;
-        background: radial-gradient(135% 70% at 16% 0%, rgba(255,255,255,0.18), rgba(255,255,255,0.05) 45%, transparent 70%); }
+        background: radial-gradient(130% 65% at 16% 0%, rgba(255,255,255,0.16), rgba(255,255,255,0.04) 45%, transparent 72%); }
+  .menu .row { text-shadow: 0 1px 3px rgba(0, 0, 0, 0.28); }
   .menu > * { position: relative; }
   .menu .row { height: 77.5px; display: flex; align-items: center;
         justify-content: space-between; padding: 0 18px 0 27px;
@@ -816,14 +816,14 @@
   body.light .preview .msgtext { color: #0A0A0A; }
   body.light .preview .msgtime { color: #8E8E93; }
   body.light .menu { background:
-        linear-gradient(155deg, rgba(255,255,255,0.62), rgba(255,255,255,0.34) 38%, rgba(255,255,255,0.16)),
-        rgba(250, 250, 250, 0.5);
+        linear-gradient(160deg, rgba(255,255,255,0.5), rgba(255,255,255,0.22) 42%, rgba(255,255,255,0.32));
         box-shadow: 0 22px 60px rgba(0, 0, 0, 0.28),
-                    inset 0 0 0 1px rgba(255, 255, 255, 0.9),
-                    inset 0 1.5px 0.5px rgba(255, 255, 255, 0.95),
-                    inset 0 -10px 24px rgba(255, 255, 255, 0.45);
-        backdrop-filter: blur(32px) saturate(1.8) brightness(1.05);
-        -webkit-backdrop-filter: blur(32px) saturate(1.8) brightness(1.05); }
+                    inset 0 0 0 1px rgba(255, 255, 255, 0.95),
+                    inset 0 1.5px 0.5px rgba(255, 255, 255, 1),
+                    inset 0 -1px 1px rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(4px) saturate(1.6) brightness(1.06);
+        -webkit-backdrop-filter: blur(4px) saturate(1.6) brightness(1.06); }
+  body.light .menu .row { text-shadow: 0 1px 2px rgba(255, 255, 255, 0.45); }
   body.light .menu::before { background:
         radial-gradient(135% 70% at 16% 0%, rgba(255,255,255,0.6), rgba(255,255,255,0.22) 45%, transparent 70%); }
   body.light .menu .row { color: #101010; }
