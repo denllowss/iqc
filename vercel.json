@@ -8,6 +8,10 @@
     {
       "source": "/iqc/",
       "destination": "/api/iqc"
+    },
+    {
+      "source": "/app",
+      "destination": "/app.html"
     }
   ],
   "functions": {
