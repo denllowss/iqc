@@ -64,21 +64,21 @@ TPL2 = '''<!DOCTYPE html>
   #stack { position: absolute; left: 29px; bottom: 30px; width: 457px; z-index: 4;
         display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
   .preview { max-width: 446px; background: rgba(61, 61, 63, 0.98);
-        border-radius: 18px; padding: 13px 16px 5px;
+        border-radius: 18px; padding: 12px 14px;
         box-shadow: 0 18px 45px rgba(0, 0, 0, 0.45); }
-  .preview .sender { color: #EDAA1B; font-weight: 600; font-size: 24px; }
-  .preview .msgtext { font-size: 26px; line-height: 33px; color: #fff;
-        margin-top: 4px; overflow-wrap: anywhere; }
-  .preview .msgtext img.apple-emoji { height: 27px; vertical-align: -5px; }
-  .preview .msgtime { text-align: right; color: #7D7D7F; font-size: 19px;
-        margin-top: 3px; line-height: 26px; }
+  .preview .sender { color: #EDAA1B; font-weight: 600; font-size: 28px; }
+  .preview .msgtext { font-size: 33px; line-height: 38px; color: #fff;
+        margin-top: 3px; overflow-wrap: anywhere; }
+  .preview .msgtext img.apple-emoji { height: 34px; vertical-align: -7px; }
+  .preview .msgtime { display: inline; color: #7D7D7F; font-size: 20px;
+        margin-left: 16px; white-space: nowrap; }
   .menu { width: 457px; background: rgba(49, 49, 49, 0.9); border-radius: 14px;
         overflow: hidden; box-shadow: 0 22px 60px rgba(0, 0, 0, 0.5);
         backdrop-filter: blur(24px) saturate(1.4);
         -webkit-backdrop-filter: blur(24px) saturate(1.4); }
   .menu .row { height: 77.5px; display: flex; align-items: center;
         justify-content: space-between; padding: 0 18px 0 27px;
-        font-size: 27px; color: #E8E7E5; }
+        font-size: 28px; color: #E8E7E5; }
   .menu .row + .row { border-top: 1px solid rgba(255, 255, 255, 0.07); }
   .menu .row svg { position: static; width: 29px; height: 29px; flex: none; }
   .menu .row.del { color: #E2554F; }
@@ -106,8 +106,7 @@ TPL2 = '''<!DOCTYPE html>
   <div id="stack">
     <div class="preview">
       <div class="sender">__NAMA__</div>
-      <div class="msgtext" id="msg">__PESAN_HTML__</div>
-      <div class="msgtime waktupesan"></div>
+      <div class="msgtext" id="msg">__PESAN_HTML__<span class="msgtime waktupesan"></span></div>
     </div>
     <div class="menu">
       <div class="row"><span>Beri Bintang</span><svg viewBox="0 0 24 24" fill="none" stroke="#E8E7E5" stroke-width="1.7" stroke-linejoin="round"><path d="M12 3.2l2.7 5.6 6.1.8-4.5 4.3 1.1 6-5.4-2.9-5.4 2.9 1.1-6L3.2 9.6l6.1-.8z"/></svg></div>
