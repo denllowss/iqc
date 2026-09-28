@@ -911,13 +911,16 @@
   /* ====== Latar chat: percakapan Instagram — tema putih & gelap ======
      Tema mengikuti opsi mode (terang = putih, gelap = hitam khas IG).
      Acak tiap refresh; ?seed=12345 pada URL mengunci latar. */
+  /* ====== Latar chat: percakapan Instagram (putih/gelap sesuai mode) ======
+     Mengikuti referensi DM Instagram: header profil, bubble pill biru bergrup,
+     "Seen", reaksi emoji, pembatas tanggal, input bar — diburamkan ringan. */
   (function makeChatWallpaper() {
     var W = 675, H = 1200;
     var off = document.createElement('canvas'); off.width = W; off.height = H;
     var g = off.getContext('2d');
     var bgEl = document.querySelector('.bg');
     var backdropEl = document.querySelector('.backdrop');
-    var WALLPAPER_BLUR = 4; /* kekuatan blur latar (px) — chat tetap terbaca */
+    var WALLPAPER_BLUR = 6;
 
     function rr(c, x, y, w, h, r) {
       r = Math.min(r, w / 2, h / 2);
@@ -929,82 +932,107 @@
       c.arcTo(x, y, x + w, y, r);
       c.closePath();
     }
-    function pill(x, y, w, h, rad, col) {
-      g.fillStyle = col; rr(g, x, y, w, h, rad); g.fill();
+    function pill(x, y, w, h, rad, col) { g.fillStyle = col; rr(g, x, y, w, h, rad); g.fill(); }
+    function bar(x, y, w, col, h) { g.fillStyle = col; g.fillRect(x, y, w, h || 9); }
+    function ling(x, y, r, col) { g.fillStyle = col; g.beginPath(); g.arc(x, y, r, 0, 7); g.fill(); }
+    function gradienAvatar(cx, cy, r, bgc) { /* cincin gradasi IG */
+      var gr = g.createLinearGradient(cx - r, cy - r, cx + r, cy + r);
+      gr.addColorStop(0, '#FEDA75'); gr.addColorStop(0.5, '#D62976'); gr.addColorStop(1, '#4F5BD5');
+      g.fillStyle = gr; g.beginPath(); g.arc(cx, cy, r, 0, 7); g.fill();
+      g.fillStyle = bgc; g.beginPath(); g.arc(cx, cy, r - 4, 0, 7); g.fill();
     }
-    function baris(x, y, w, col) { g.fillStyle = col; g.fillRect(x, y, w, 9); }
 
     function render() {
       var light = !DARK;
-      var BG  = light ? '#FFFFFF' : '#000000';
-      var INB = light ? '#EFEFEF' : '#262626';
-      var OUT = '#3797F0'; /* biru khas DM Instagram, sama di kedua tema */
-      var LIN = light ? 'rgba(38,38,38,0.5)'  : 'rgba(233,237,239,0.55)';
-      var LOUT = 'rgba(255,255,255,0.8)';
-      var META = light ? 'rgba(60,60,67,0.45)' : 'rgba(120,120,128,0.6)';
-
-      g.fillStyle = BG; g.fillRect(0, 0, W, H);
+      var BG   = light ? '#FFFFFF' : '#000000';
+      var INB  = light ? '#EFEFEF' : '#262626';
+      var OUT  = '#3797F0';
+      var LIN  = light ? 'rgba(38,38,38,0.45)' : 'rgba(233,237,239,0.5)';
+      var LOUT = 'rgba(255,255,255,0.75)';
+      var META = light ? 'rgba(60,60,67,0.4)' : 'rgba(120,120,128,0.55)';
       var rnd = mulberry32((seed ^ 0x16C7) >>> 0);
 
-      /* pembatas waktu */
-      pill((W - 150) / 2, 70, 150, 30, 15, light ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.08)');
-      baris(W / 2 - 38, 81, 76, META);
+      g.fillStyle = BG; g.fillRect(0, 0, W, H);
 
-      var y = 135;
-      while (y < H - 90) {
+      /* header DM: panah, avatar gradasi, nama, ikon telepon/video */
+      g.fillStyle = light ? '#FAFAFA' : '#111111';
+      g.fillRect(0, 0, W, 110);
+      g.strokeStyle = light ? '#262626' : '#F5F5F5'; g.lineWidth = 4; g.lineCap = 'round';
+      g.beginPath(); g.moveTo(46, 44); g.lineTo(66, 58); g.lineTo(46, 72); g.stroke();
+      gradienAvatar(122, 55, 34, BG);
+      bar(174, 44, 150, light ? '#262626' : '#F5F5F5', 15);
+      g.strokeStyle = light ? '#262626' : '#F5F5F5'; g.lineWidth = 3.4;
+      g.beginPath(); g.arc(W - 120, 55, 15, 0, 7); g.stroke();     /* telepon */
+      rr(g, W - 74, 40, 34, 26, 7); g.stroke();                     /* video */
+      g.beginPath(); g.moveTo(W - 40, 46); g.lineTo(W - 26, 40); g.lineTo(W - 26, 66); g.lineTo(W - 40, 60); g.closePath(); g.stroke();
+
+      /* pembatas tanggal */
+      var dcol = light ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.09)';
+      pill((W - 150) / 2, 135, 150, 30, 15, dcol);
+      bar(W / 2 - 38, 146, 76, META);
+
+      var y = 200;
+      var seenBaris = 0;
+      while (y < H - 240) {
         var kanan = rnd() < 0.55;
         var tipe = rnd();
-        var x = kanan ? W - 44 : 44;
-
-        if (tipe < 0.14) { /* pesan dari akun lain: avatar + gelembung */
-          var bw = 200 + rnd() * 170, bh = 30 + (1 + Math.floor(rnd() * 2)) * 24;
-          g.fillStyle = 'hsla(' + Math.floor(rnd() * 360) + ',42%,' + (light ? '58%' : '46%') + ',0.85)';
-          g.beginPath(); g.arc(64, y + bh / 2, 19, 0, 7); g.fill();
-          x = 108; bw = W - x - 100 - rnd() * 60;
-          pill(x, y, bw, bh, 21, INB);
-          for (var i = 0; i < Math.floor(bh / 24); i++)
-            baris(x + 18, y + 16 + i * 24, (bw - 60) * (0.55 + rnd() * 0.45), LIN);
-          y += bh;
-        } else if (tipe < 0.26) { /* foto dikirim */
-          var fw = 230 + rnd() * 150, fh = 150 + rnd() * 100;
-          var fx = kanan ? W - 44 - fw : 44;
-          pill(fx, y, fw, fh, 18, kanan ? (light ? '#5FA8EF' : '#2E6EA6') : (light ? '#DCD6CC' : '#3A3A3C'));
-          g.fillStyle = 'rgba(255,255,255,0.35)';
-          g.beginPath(); g.arc(fx + fw * 0.72, y + fh * 0.3, 15, 0, 7); g.fill();
-          g.fillStyle = kanan ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.15)';
-          g.beginPath();
-          g.moveTo(fx + 12, y + fh - 12); g.lineTo(fx + fw * 0.45, y + 22); g.lineTo(fx + fw - 12, y + fh - 12);
-          g.closePath(); g.fill();
-          y += fh;
-        } else if (tipe < 0.36) { /* stiker/emoji besar tanpa gelembung */
-          var cols = ['#F4B400', '#E5564B', '#4FAE4E', '#5B8DEF', '#F28AB2'];
-          var n = 1 + Math.floor(rnd() * 2);
-          for (var e = 0; e < n; e++) {
-            g.fillStyle = cols[Math.floor(rnd() * cols.length)];
-            g.beginPath();
-            g.arc(x - (kanan ? -1 : 1) * e * 52 - (kanan ? 26 : 0), y + 26, 22, 0, 7);
-            g.fill();
+        var grup = (tipe >= 0.36 && rnd() < 0.5) ? 2 + Math.floor(rnd() * 2) : 1;
+        for (var gi = 0; gi < grup && y < H - 240; gi++) {
+          var terakhir = gi === grup - 1;
+          if (!kanan) { /* bubble masuk + avatar pengirim */
+            var bw = 190 + rnd() * 190, bh = 26 + (1 + Math.floor(rnd() * 2)) * 24;
+            var hue = Math.floor(rnd() * 360);
+            ling(64, y + 26, 19, 'hsla(' + hue + ',42%,' + (light ? '58%' : '46%') + ',0.85)');
+            var bx = 108;
+            pill(bx, y, bw, bh, bh / 2, INB);
+            for (var li = 0; li < Math.floor(bh / 24); li++)
+              bar(bx + 20, y + 15 + li * 24, (bw - 64) * (0.5 + rnd() * 0.5), LIN);
+            if (terakhir && rnd() < 0.35) { /* reaksi emoji kecil menempel */
+              var rcols = ['#F4B400', '#E5564B', '#4FAE4E', '#D62976'];
+              var rx = bx + 30 + rnd() * (bw - 60);
+              ling(rx, y + bh + 13, 13, light ? '#FFFFFF' : '#1A1A1A');
+              ling(rx, y + bh + 13, 9, rcols[Math.floor(rnd() * rcols.length)]);
+              y += 26;
+            }
+            y += bh;
+          } else { /* bubble keluar biru */
+            var lines = 1 + (grup > 1 ? 1 : (rnd() < 0.3 ? 1 : 0));
+            var bw2 = 170 + rnd() * 210, bh2 = 26 + lines * 24;
+            var bx2 = W - 44 - bw2;
+            pill(bx2, y, bw2, bh2, bh2 / 2, OUT);
+            for (var l2 = 0; l2 < lines; l2++)
+              bar(bx2 + 20, y + 15 + l2 * 24, (bw2 - 56) * (l2 === lines - 1 ? 0.45 + rnd() * 0.4 : 0.75 + rnd() * 0.25), LOUT);
+            if (terakhir && rnd() < 0.3) {
+              var rx2 = bx2 + bw2 - 30 - rnd() * (bw2 - 60);
+              ling(rx2, y + bh2 + 13, 13, light ? '#FFFFFF' : '#1A1A1A');
+              ling(rx2, y + bh2 + 13, 9, '#E5564B');
+              y += 26;
+            }
+            if (terakhir && rnd() < 0.4) { /* label Seen */
+              bar(W - 110, y + bh2 + 18, 62, META, 10);
+              y += 26;
+              seenBaris++;
+            }
+            y += bh2;
           }
-          y += 56;
-        } else { /* gelembung teks */
-          var lines = 1 + Math.floor(rnd() * 3);
-          var bw2 = 170 + rnd() * 220, bh2 = 26 + lines * 24;
-          var bx = kanan ? W - 44 - bw2 : 44;
-          pill(bx, y, bw2, bh2, 21, kanan ? OUT : INB);
-          for (var l2 = 0; l2 < lines; l2++)
-            baris(bx + 18, y + 16 + l2 * 24, (bw2 - 56) * (l2 === lines - 1 ? 0.45 + rnd() * 0.4 : 0.75 + rnd() * 0.25),
-                  kanan ? LOUT : LIN);
-          if (kanan && rnd() < 0.4) { /* avatar "dilihat" */
-            g.fillStyle = 'hsla(' + Math.floor(rnd() * 360) + ',42%,' + (light ? '58%' : '46%') + ',0.85)';
-            g.beginPath(); g.arc(W - 57, y + bh2 + 24, 13, 0, 7); g.fill();
-            y += 22;
-          }
-          y += bh2;
+          y += 12 + rnd() * 10;
         }
-        y += 18 + rnd() * 18;
+        y += 14 + rnd() * 16;
       }
 
-      /* buramkan ringan — percakapan tetap terlihat jelas */
+      /* input bar bawah khas IG */
+      var iy = H - 150;
+      g.fillStyle = light ? '#FFFFFF' : '#000000';
+      g.fillRect(0, iy - 26, W, 176);
+      pill(40, iy, W - 190, 86, 43, light ? '#EFEFEF' : '#262626');
+      bar(96, iy + 36, 120, META, 13);          /* teks "Message..." */
+      ling(64 + 6, iy + 43, 13, 'none');
+      g.strokeStyle = META; g.lineWidth = 3.2;
+      g.beginPath(); g.arc(88, iy + 43, 14, 0, 7); g.stroke();   /* ikon smiley */
+      g.beginPath(); g.arc(88, iy + 43, 15, Math.PI * 1.15, Math.PI * 1.85); g.stroke();
+      rr(g, W - 128, iy + 14, 52, 58, 14); g.stroke();            /* kamera */
+
+      /* buramkan ringan — percakapan tetap terbaca */
       var fin = document.createElement('canvas'); fin.width = W; fin.height = H;
       var fc = fin.getContext('2d');
       fc.filter = 'blur(' + WALLPAPER_BLUR + 'px)';

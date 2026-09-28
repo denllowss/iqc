@@ -911,14 +911,59 @@
       g.closePath(); g.fill();
     }
     function line(lx, ly, lw, lh, c) { g.fillStyle = c; g.fillRect(lx, ly, lw, lh); }
+    function tick2(tx, ty, col) { /* centang ganda WA */
+      g.strokeStyle = col || '#53BDEB'; g.lineWidth = 2.2; g.lineCap = 'round';
+      g.beginPath(); g.moveTo(tx, ty + 3); g.lineTo(tx + 3, ty + 6); g.lineTo(tx + 9, ty - 1); g.stroke();
+      g.beginPath(); g.moveTo(tx + 6, ty + 3); g.lineTo(tx + 9, ty + 6); g.lineTo(tx + 15, ty - 1); g.stroke();
+    }
+    function rr(c, x, y, w, h, r) {
+      r = Math.min(r, w / 2, h / 2);
+      c.beginPath();
+      c.moveTo(x + r, y);
+      c.arcTo(x + w, y, x + w, y + h, r);
+      c.arcTo(x + w, y + h, x, y + h, r);
+      c.arcTo(x, y + h, x, y, r);
+      c.arcTo(x, y, x + w, y, r);
+      c.closePath();
+    }
+    function ling(cx, cy, rad, c) { g.fillStyle = c; g.beginPath(); g.arc(cx, cy, rad, 0, 7); g.fill(); }
     function tick(tx, ty) { /* centang ganda biru */
       g.strokeStyle = '#53BDEB'; g.lineWidth = 2.4; g.lineCap = 'round';
       g.beginPath(); g.moveTo(tx, ty + 4); g.lineTo(tx + 4, ty + 8); g.lineTo(tx + 12, ty - 2); g.stroke();
       g.beginPath(); g.moveTo(tx + 8, ty + 4); g.lineTo(tx + 12, ty + 8); g.lineTo(tx + 20, ty - 2); g.stroke();
     }
-    /* pembatas tanggal (bar, tanpa teks -> deterministik) */
-    pill('#182229', (W - 170) / 2, 96, 170, 42, 10);
-    line(W / 2 - 31, 112, 62, 9, 'rgba(134,150,160,0.75)');
+    /* pembatas tanggal berteks ala WA */
+    g.fillStyle = '#182229';
+    g.beginPath();
+    g.moveTo((W - 210) / 2 + 12, 96);
+    g.arcTo((W + 210) / 2, 96, (W + 210) / 2, 138, 12);
+    g.arcTo((W + 210) / 2, 138, (W - 210) / 2, 138, 12);
+    g.arcTo((W - 210) / 2, 138, (W - 210) / 2, 96, 12);
+    g.arcTo((W - 210) / 2, 96, (W + 210) / 2, 96, 12);
+    g.closePath(); g.fill();
+    g.fillStyle = 'rgba(134,150,160,0.9)';
+    g.font = '600 19px sans-serif'; g.textAlign = 'center';
+    g.fillText('28 Maret 2026', W / 2, 124);
+    g.textAlign = 'left';
+
+    /* header WA: avatar + nama + ikon video/telepon/dots */
+    g.fillStyle = '#202C33'; g.fillRect(0, 0, W, 108);
+    g.fillStyle = '#8696A0';                 /* panah kembali */
+    g.strokeStyle = '#AEBAC1'; g.lineWidth = 4; g.lineCap = 'round'; g.lineJoin = 'round';
+    g.beginPath(); g.moveTo(50, 38); g.lineTo(30, 56); g.lineTo(50, 74); g.stroke();
+    ling(112, 56, 33, '#6A7175');            /* avatar */
+    g.fillStyle = '#AEBAC1';
+    g.beginPath(); g.arc(112, 48, 11, 0, 7); g.fill();          /* kepala */
+    g.beginPath(); g.ellipse(112, 74, 17, 11, 0, 0, 7); g.fill(); /* badan */
+    g.fillStyle = '#E9EDEF';
+    g.font = '600 26px sans-serif';
+    g.fillText('Anna', 162, 66);
+    g.strokeStyle = '#AEBAC1'; g.lineWidth = 3.4;
+    rr(g, W - 220, 42, 44, 30, 8); g.stroke();                  /* video */
+    g.beginPath(); g.moveTo(W - 176, 50); g.lineTo(W - 160, 41); g.lineTo(W - 160, 63); g.lineTo(W - 176, 54); g.closePath(); g.stroke();
+    g.beginPath(); g.arc(W - 116, 57, 15, Math.PI * 0.4, Math.PI * 1.6, true); g.stroke(); /* telepon */
+    g.beginPath(); g.moveTo(W - 130, 68); g.lineTo(W - 103, 68); g.stroke();
+    for (var dt = 0; dt < 3; dt++) ling(W - 58 + (dt - 1) * 11, 57, 2.8, '#AEBAC1'); /* dots */
 
     var IN = '#202C33', OUT = '#005C4B', TXT = 'rgba(233,237,239,0.85)', META = 'rgba(134,150,160,0.8)';
     y = 175;
@@ -963,9 +1008,12 @@
           var lw2 = (bw - 40) * (ln === lines - 1 ? 0.45 + rnd() * 0.35 : 0.8 + rnd() * 0.2);
           line((kanan ? W - 44 - bw : 44) + 20, y + 18 + ln * 26, lw2, 9, TXT);
         }
-        var mx = (kanan ? W - 44 - bw : 44) + bw - (kanan ? 62 : 44);
-        line(mx, y + bh3 - 24, 30, 8, META);
-        if (kanan) tick(mx + 40, y + bh3 - 26);
+        var bxw = kanan ? W - 44 - bw : 44;
+        g.fillStyle = kanan ? 'rgba(11,20,26,0.45)' : 'rgba(134,150,160,0.65)';
+        g.font = '400 14px sans-serif';
+        var jam = String(9 + Math.floor(rnd() * 13)) + '.' + ('0' + Math.floor(rnd() * 59)).slice(-2);
+        g.fillText(jam, kanan ? bxw + bw - 58 : bxw + 16, y + bh3 - 10);
+        if (kanan) tick2(bxw + bw - 34, y + bh3 - 22);
         y += bh3;
       }
       y += 14 + rnd() * 16;
@@ -980,11 +1028,28 @@
       g.globalAlpha = 1;
     }
 
-    /* buramkan ringan (4px) — bubble tetap jelas terlihat */
+    /* input bar WA: pill + smiley, klip, kamera, tombol mic hijau */
+    var iy = H - 128;
+    pill('#202C33', 34, iy, W - 150, 84, 42);
+    g.strokeStyle = '#8696A0'; g.lineWidth = 3.2;
+    g.beginPath(); g.arc(78, iy + 40, 15, 0, 7); g.stroke();              /* smiley */
+    g.beginPath(); g.arc(78, iy + 40, 16, Math.PI * 1.15, Math.PI * 1.85); g.stroke();
+    rr(g, W - 232, iy + 22, 40, 36, 9); g.stroke();                        /* klip */
+    g.beginPath(); g.moveTo(W - 212, iy + 22); g.quadraticCurveTo(W - 204, iy + 8, W - 196, iy + 22); g.stroke();
+    rr(g, W - 168, iy + 20, 40, 40, 10); g.stroke();                       /* kamera */
+    g.beginPath(); g.arc(W - 148, iy + 40, 8, 0, 7); g.stroke();
+    ling(W - 58, iy + 42, 42, '#00A884');                                  /* mic hijau */
+    g.fillStyle = '#FFFFFF';
+    rr(g, W - 68, iy + 16, 20, 34, 10); g.fill();
+    g.beginPath(); g.moveTo(W - 58, iy + 52); g.lineTo(W - 58, iy + 66); g.stroke();
+    g.strokeStyle = '#FFFFFF'; g.lineWidth = 3;
+    g.beginPath(); g.moveTo(W - 70, iy + 62); g.quadraticCurveTo(W - 58, iy + 76, W - 46, iy + 62); g.stroke();
+
+    /* buramkan ringan (6px) — percakapan tetap terbaca jelas */
     var fin = document.createElement('canvas');
     fin.width = W; fin.height = H;
     var fc = fin.getContext('2d');
-    fc.filter = 'blur(4px)';
+    fc.filter = 'blur(6px)';
     fc.drawImage(off, 0, 0);
     fc.filter = 'none';
     var url = fin.toDataURL('image/jpeg', 0.9);
