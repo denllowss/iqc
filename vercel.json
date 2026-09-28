@@ -12,6 +12,10 @@
     {
       "source": "/app",
       "destination": "/app.html"
+    },
+    {
+      "source": "/docs",
+      "destination": "/docs.html"
     }
   ],
   "functions": {

@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Docs — IQC API</title>
+<meta name="description" content="Dokumentasi API IQC — Instagram DM Quote Card. Endpoint, parameter, dan contoh penggunaan.">
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #0d0d12;
+    --panel: #16161d;
+    --panel2: #1c1c25;
+    --line: #2a2a36;
+    --text: #ececf1;
+    --muted: #9a9aab;
+    --accent: #d62976;
+    --accent2: #962fbf;
+    --accent3: #4f5bd5;
+    --ok: #4ade80;
+    --warn: #fbbf24;
+    --code: #0a0a0f;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    background:
+      radial-gradient(900px 500px at 85% -10%, rgba(150,47,191,.18), transparent 60%),
+      radial-gradient(800px 500px at -10% 20%, rgba(79,91,213,.16), transparent 60%),
+      radial-gradient(700px 500px at 60% 110%, rgba(214,41,118,.14), transparent 60%),
+      var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.65;
+  }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 40px 20px 80px; }
+
+  header.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 34px; flex-wrap: wrap; }
+  .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text); }
+  .brand .logo {
+    width: 42px; height: 42px; border-radius: 13px; flex: none;
+    background: linear-gradient(135deg, var(--accent3), var(--accent2) 55%, var(--accent));
+    display: grid; place-items: center; font-size: 20px;
+    box-shadow: 0 6px 20px rgba(150,47,191,.35);
+  }
+  .brand b { font-size: 18px; letter-spacing: .2px; }
+  .brand small { display: block; color: var(--muted); font-size: 12px; font-weight: 400; }
+  .topnav { display: flex; gap: 8px; }
+  .chip {
+    display: inline-block; padding: 8px 14px; border-radius: 999px; text-decoration: none;
+    font-size: 13px; font-weight: 600; color: var(--text);
+    background: var(--panel); border: 1px solid var(--line); transition: .15s;
+  }
+  .chip:hover { border-color: var(--accent2); transform: translateY(-1px); }
+
+  .hero h1 { font-size: clamp(26px, 5vw, 38px); line-height: 1.2; letter-spacing: -.5px; }
+  .hero h1 .grad {
+    background: linear-gradient(90deg, var(--accent3), var(--accent2) 50%, var(--accent));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .hero p { color: var(--muted); margin-top: 10px; max-width: 640px; }
+  .hero .cta { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
+  .btn {
+    display: inline-block; padding: 10px 18px; border-radius: 12px; text-decoration: none;
+    font-weight: 600; font-size: 14px; transition: .15s;
+  }
+  .btn.grad { color: #fff; background: linear-gradient(135deg, var(--accent3), var(--accent2) 55%, var(--accent)); box-shadow: 0 8px 24px rgba(214,41,118,.3); }
+  .btn.grad:hover { transform: translateY(-2px); }
+  .btn.ghost { color: var(--text); border: 1px solid var(--line); background: var(--panel); }
+  .btn.ghost:hover { border-color: var(--accent2); }
+
+  nav.toc {
+    display: flex; flex-wrap: wrap; gap: 8px; margin: 28px 0 8px;
+  }
+  nav.toc a {
+    font-size: 13px; color: var(--muted); text-decoration: none;
+    padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line); background: rgba(22,22,29,.7);
+  }
+  nav.toc a:hover { color: var(--text); border-color: var(--accent2); }
+
+  section { margin-top: 44px; }
+  h2 {
+    font-size: 21px; margin-bottom: 6px; display: flex; align-items: center; gap: 10px;
+    scroll-margin-top: 20px;
+  }
+  h2 .no {
+    font-size: 12px; font-weight: 700; color: #fff; letter-spacing: .5px;
+    background: linear-gradient(135deg, var(--accent3), var(--accent));
+    border-radius: 8px; padding: 3px 9px;
+  }
+  section > p.desc { color: var(--muted); margin-bottom: 16px; }
+
+  .card {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 16px;
+    padding: 18px 20px; margin-top: 14px;
+  }
+  .card h3 { font-size: 15.5px; margin-bottom: 8px; }
+  .card p { color: var(--muted); font-size: 14px; }
+
+  .ep {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    background: var(--panel2); border: 1px solid var(--line); border-radius: 14px;
+    padding: 12px 14px; margin: 12px 0; font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 13.5px;
+  }
+  .method {
+    font-weight: 700; font-size: 12px; letter-spacing: .5px; padding: 3px 10px; border-radius: 7px;
+    background: rgba(74,222,128,.15); color: var(--ok); border: 1px solid rgba(74,222,128,.3); flex: none;
+  }
+  .ep code { color: var(--text); word-break: break-all; }
+  .ep .tag { margin-left: auto; font-family: Inter, sans-serif; font-size: 12px; color: var(--muted); flex: none; }
+
+  table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 14px; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .8px; font-weight: 600; }
+  td code, li code, p code {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 12.5px;
+    background: var(--code); border: 1px solid var(--line); border-radius: 6px; padding: 2px 7px; color: #f0abfc;
+    word-break: break-all;
+  }
+  td .tipe { color: var(--accent3); font-family: ui-monospace, Menlo, monospace; font-size: 12.5px; }
+  td .req { color: var(--warn); font-size: 11px; font-weight: 700; }
+  .scroll { overflow-x: auto; }
+
+  .codeblock { position: relative; margin-top: 12px; }
+  .codeblock pre {
+    background: var(--code); border: 1px solid var(--line); border-radius: 14px;
+    padding: 16px 18px; overflow-x: auto;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 13px; line-height: 1.7;
+    color: #d8d8e4;
+  }
+  .codeblock .lang {
+    position: absolute; top: 10px; right: 52px; font-size: 11px; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 1px;
+  }
+  .copy {
+    position: absolute; top: 8px; right: 8px; border: 1px solid var(--line); background: var(--panel);
+    color: var(--muted); border-radius: 8px; font-size: 12px; padding: 4px 10px; cursor: pointer;
+  }
+  .copy:hover { color: var(--text); border-color: var(--accent2); }
+  .codeblock .c { color: #6b7280; }
+  .codeblock .s { color: #86efac; }
+  .codeblock .u { color: #93c5fd; }
+
+  .note {
+    display: flex; gap: 12px; align-items: flex-start;
+    background: rgba(251,191,36,.07); border: 1px solid rgba(251,191,36,.25);
+    border-radius: 14px; padding: 14px 16px; margin-top: 14px; font-size: 14px; color: #e5d9b3;
+  }
+  .note.ok { background: rgba(74,222,128,.07); border-color: rgba(74,222,128,.25); color: #c7e8d0; }
+  .note .ic { flex: none; font-size: 16px; }
+
+  footer {
+    margin-top: 60px; padding-top: 22px; border-top: 1px solid var(--line);
+    color: var(--muted); font-size: 13px; display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+  }
+  footer a { color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <a class="brand" href="/">
+      <span class="logo">📸</span>
+      <span><b>IQC</b><small>Instagram DM Quote Card API</small></span>
+    </a>
+    <nav class="topnav">
+      <a class="chip" href="/app">🎛️ Coba Interaktif</a>
+      <a class="chip" href="https://github.com/denllowss/iqc" target="_blank" rel="noopener">💻 GitHub</a>
+    </nav>
+  </header>
+
+  <div class="hero">
+    <h1>Dokumentasi <span class="grad">IQC API</span></h1>
+    <p>Kirim satu URL, dapat <b>foto JPG</b> kartu Direct Message Instagram —
+       emoji gaya iPhone, wallpaper percakapan blur yang berbeda setiap request,
+       jam WIB otomatis, rasio 9:16 (1350×2400 px).</p>
+    <div class="cta">
+      <a class="btn grad" href="/iqc?pesan=halo%E2%9D%A4&mode=dark">▶️ Coba: /iqc?pesan=halo❤&mode=dark</a>
+      <a class="btn ghost" href="/app">🎛️ Mode Interaktif</a>
+    </div>
+  </div>
+
+  <nav class="toc">
+    <a href="#endpoint">Endpoint</a>
+    <a href="#parameter">Parameter</a>
+    <a href="#contoh">Contoh Penggunaan</a>
+    <a href="#respons">Respons &amp; Error</a>
+    <a href="#batasan">Batasan &amp; Catatan</a>
+    <a href="#integrasi">Integrasi Bot WA</a>
+  </nav>
+
+  <!-- ================= ENDPOINT ================= -->
+  <section id="endpoint">
+    <h2><span class="no">01</span> Endpoint</h2>
+    <p class="desc">Semua endpoint memakai method <code style="all:unset;font-family:ui-monospace,Menlo,monospace;background:var(--code);border:1px solid var(--line);border-radius:6px;padding:2px 7px;font-size:12.5px">GET</code> dan tidak memerlukan autentikasi/API key.</p>
+
+    <div class="ep"><span class="method">GET</span><code>/iqc?pesan=halo❤</code><span class="tag">utama → foto JPG</span></div>
+    <div class="card">
+      <h3>Hasil: foto JPEG siap pakai</h3>
+      <p>Mengembalikan <code>image/jpeg</code> berukuran <b>1350×2400 px</b> (rasio 9:16, kualitas 92).
+         Kartu dirender headless Chromium — tampilan identik dengan iPhone asli.</p>
+    </div>
+
+    <div class="ep"><span class="method">GET</span><code>/iqc?...&amp;html=1</code><span class="tag">halaman interaktif</span></div>
+    <div class="card">
+      <h3>Hasil: halaman HTML (<code>text/html</code>)</h3>
+      <p>Tanpa render server — halaman dibuka langsung di browser, teks bubble bisa diedit,
+         ada tombol ganti 🌙/☀️. Cocok untuk dibagikan sebagai link.</p>
+    </div>
+
+    <div class="ep"><span class="method">GET</span><code>/api/iqc?pesan=...</code><span class="tag">alias langsung</span></div>
+    <div class="card">
+      <h3>Endpoint function asli</h3>
+      <p>Perilaku sama persis dengan <code>/iqc</code> (tanpa rewrite). Berguna bila rewrite
+         dimatikan atau untuk debugging.</p>
+    </div>
+
+    <div class="ep"><span class="method">GET</span><code>/</code><span class="tag">dashboard</span></div>
+    <div class="ep"><span class="method">GET</span><code>/app</code><span class="tag">halaman interaktif</span></div>
+    <div class="ep"><span class="method">GET</span><code>/docs</code><span class="tag">halaman ini</span></div>
+  </section>
+
+  <!-- ================= PARAMETER ================= -->
+  <section id="parameter">
+    <h2><span class="no">02</span> Parameter</h2>
+    <p class="desc">Parameter dikirim sebagai <i>query string</i>. Semua parameter opsional kecuali <code>pesan</code> (jika kosong, memakai teks default).</p>
+    <div class="card scroll">
+      <table>
+        <tr><th>Parameter</th><th>Tipe</th><th>Default</th><th>Keterangan</th></tr>
+        <tr>
+          <td><code>pesan</code> <span class="req">WAJIB*</span></td>
+          <td><span class="tipe">string</span></td>
+          <td><code>see u, hopefully…</code></td>
+          <td>Isi bubble chat. Maks <b>1000</b> karakter. Mendukung emoji (otomatis jadi emoji Apple) &amp; baris baru (<code>%0A</code> → baris baru). Karakter berbahaya otomatis di-escape (aman XSS).</td>
+        </tr>
+        <tr>
+          <td><code>mode</code></td>
+          <td><span class="tipe">light | dark</span></td>
+          <td><code>light</code></td>
+          <td><code>dark</code> = dark mode ala IG (UI gelap + wallpaper percakapan gelap). <code>light</code> memaksa mode terang.</td>
+        </tr>
+        <tr>
+          <td><code>seed</code></td>
+          <td><span class="tipe">integer</span></td>
+          <td>acak</td>
+          <td>Kunci wallpaper &amp; level baterai (30–100%). Seed sama → hasil identik (deterministik). Tanpa <code>seed</code>, tiap request menghasilkan wallpaper berbeda.</td>
+        </tr>
+        <tr>
+          <td><code>html</code></td>
+          <td><span class="tipe">1 | true</span></td>
+          <td><code>0</code></td>
+          <td><code>1</code> = kembalikan halaman HTML interaktif, bukan JPG.</td>
+        </tr>
+      </table>
+    </div>
+    <div class="note"><span class="ic">ℹ️</span><span>* Secara teknis <code>pesan</code> boleh dikosongkan — server memakai teks default <i>"see u, hopefully we will meet in the next life."</i></span></div>
+  </section>
+
+  <!-- ================= CONTOH ================= -->
+  <section id="contoh">
+    <h2><span class="no">03</span> Contoh Penggunaan</h2>
+
+    <h3 style="margin:18px 0 2px; font-size:15px"> Browser langsung</h3>
+    <p class="desc" style="font-size:13.5px">Tempel di address bar — browser otomatis meng-encode emoji &amp; spasi.</p>
+    <div class="codeblock"><span class="lang">url</span><button class="copy">Salin</button>
+<pre>/iqc?pesan=halo❤
+/iqc?pesan=good night🌙&amp;mode=dark
+/iqc?pesan=see u…&amp;mode=dark&amp;seed=42
+/iqc?pesan=baris%20pertama%0Abaris%20kedua</pre></div>
+
+    <h3 style="margin:18px 0 2px; font-size:15px"> cURL</h3>
+    <div class="codeblock"><span class="lang">bash</span><button class="copy">Salin</button>
+<pre><span class="c"># simpan hasil JPG ke file</span>
+curl -o hasil.jpg <span class="s">"https://DOMAIN/iqc?pesan=halo%E2%9D%A4&mode=dark"</span>
+
+<span class="c"># wallpaper terkunci (seed) — hasil selalu identik</span>
+curl -o fix.jpg <span class="s">"https://DOMAIN/iqc?pesan=hai&seed=42"</span></pre></div>
+
+    <h3 style="margin:18px 0 2px; font-size:15px"> Node.js (fetch)</h3>
+    <div class="codeblock"><span class="lang">node</span><button class="copy">Salin</button>
+<pre><span class="c">// pesan otomatis di-encode oleh URLSearchParams (emoji aman)</span>
+<span class="u">const</span> params = <span class="u">new</span> URLSearchParams({ pesan: <span class="s">'halo❤'</span>, mode: <span class="s">'dark'</span> });
+<span class="u">const</span> res = await fetch(<span class="s">`https://DOMAIN/iqc?${params}`</span>);
+
+<span class="u">const</span> ct = res.headers.get(<span class="s">'content-type'</span>);
+<span class="u">if</span> (!ct?.startsWith(<span class="s">'image/'</span>)) <span class="u">throw new</span> Error(<span class="s">'render gagal (coba ulang)'</span>);
+
+<span class="u">const</span> buffer = Buffer.from(await res.arrayBuffer());
+<span class="c">// buffer = JPEG siap dikirim</span></pre></div>
+
+    <h3 style="margin:18px 0 2px; font-size:15px"> Python (requests)</h3>
+    <div class="codeblock"><span class="lang">python</span><button class="copy">Salin</button>
+<pre><span class="u">import</span> requests
+
+r = requests.get(<span class="s">"https://DOMAIN/iqc"</span>, params={
+    <span class="s">"pesan"</span>: <span class="s">"halo❤"</span>,
+    <span class="s">"mode"</span>: <span class="s">"dark"</span>,
+}, timeout=<span class="s">45</span>)
+r.raise_for_status()
+
+<span class="u">if</span> r.headers[<span class="s">"content-type"</span>].startswith(<span class="s">"image/"</span>):
+    <span class="u">open</span>(<span class="s">"hasil.jpg"</span>, <span class="s">"wb"</span>).write(r.content)</pre></div>
+
+    <h3 style="margin:18px 0 2px; font-size:15px"> HTML &lt;img&gt;</h3>
+    <div class="codeblock"><span class="lang">html</span><button class="copy">Salin</button>
+<pre>&lt;<span class="u">img</span> src=<span class="s">"https://DOMAIN/iqc?pesan=halo%E2%9D%A4&amp;mode=dark&amp;seed=7"</span>
+     alt=<span class="s">"kartu ucapan"</span> width=<span class="s">"405"</span>&gt;</pre></div>
+  </section>
+
+  <!-- ================= RESPONS ================= -->
+  <section id="respons">
+    <h2><span class="no">04</span> Respons &amp; Error</h2>
+    <div class="card scroll">
+      <table>
+        <tr><th>Kasus</th><th>Status</th><th>Content-Type</th><th>Isi</th></tr>
+        <tr><td>Sukses (default)</td><td><code>200</code></td><td><code>image/jpeg</code></td><td>Foto kartu 1350×2400</td></tr>
+        <tr><td>Dengan <code>html=1</code></td><td><code>200</code></td><td><code>text/html</code></td><td>Halaman interaktif</td></tr>
+        <tr><td>Render gagal (jarang)</td><td><code>200</code></td><td><code>text/html</code></td><td>Halaman fallback — link tetap bisa dibuka, bot tinggal mendeteksi content-type</td></tr>
+        <tr><td>Server error</td><td><code>500</code></td><td><code>text/plain</code></td><td>Pesan kesalahan singkat</td></tr>
+      </table>
+    </div>
+    <div class="note"><span class="ic">🌙</span><span><b>Cold start:</b> request pertama setelah idle bisa memakan 3–10 detik (Chromium harus di-init). Request berikutnya jauh lebih cepat. Untuk bot, disarankan retry 1–2x ketika respons bukan <code>image/*</code>.</span></div>
+    <div class="note ok"><span class="ic">🔒</span><span><b>Cache:</b> tanpa <code>seed</code>, respons <code>Cache-Control: no-store</code> (tiap request wallpaper baru). Dengan <code>seed</code>, hasil deterministik sehingga aman di-cache CDN/client.</span></div>
+  </section>
+
+  <!-- ================= BATASAN ================= -->
+  <section id="batasan">
+    <h2><span class="no">05</span> Batasan &amp; Catatan</h2>
+    <div class="card">
+      <ul style="margin-left:18px; color:var(--muted); font-size:14px; display:grid; gap:8px">
+        <li>Pesan maksimal <b>1000 karakter</b>; karakter kontrol dibuang otomatis.</li>
+        <li>Emoji dirender <b>gaya Apple/iPhone</b> di semua perangkat — emoji umum (❤️😂🔥💯🙏 dll.) tertanam di server; emoji lain dimuat dari CDN saat render, dengan fallback ke teks bila CDN gagal.</li>
+        <li>Wallpaper = percakapan tiruan (bubble, emoji, foto, voice note, avatar, "Dilihat") yang diburamkan — <b>acak setiap request</b>, kecuali <code>seed</code> diberikan.</li>
+        <li>Jam status bar otomatis <b>WIB (Asia/Jakarta)</b>, format <code>HH.MM</code>, update tiap detik pada mode interaktif.</li>
+        <li>Baterai status bar acak <b>30–100%</b> (mengikuti seed).</li>
+        <li>Teks pesan di-escape server-side — <b>aman dari XSS</b>; jangan khawatir menyisipkan karakter spesial.</li>
+        <li>Ukuran &amp; kualitas hasil: <b>1350×2400 px, JPEG quality 92</b> (~150–250 KB).</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ================= INTEGRASI ================= -->
+  <section id="integrasi">
+    <h2><span class="no">06</span> Integrasi Bot WhatsApp</h2>
+    <p class="desc">Contoh inti integrasi (versi lengkap tersedia di repo, folder <code>iqc-bot/</code>): parsing perintah, validasi, retry cold start.</p>
+    <div class="codeblock"><span class="lang">whatsapp</span><button class="copy">Salin</button>
+<pre><span class="c">// perintah: .iqc halo❤ |dark   atau   .iqc halo -dark -seed=42</span>
+<span class="u">const</span> params = <span class="u">new</span> URLSearchParams({ pesan: msg });
+<span class="u">if</span> (mode === <span class="s">'dark'</span>) params.set(<span class="s">'mode'</span>, <span class="s">'dark'</span>);
+<span class="u">if</span> (seed) params.set(<span class="s">'seed'</span>, seed);
+
+<span class="u">const</span> res = await fetch(<span class="s">`https://DOMAIN/iqc?${params}`</span>, {
+  headers: { accept: <span class="s">'image/jpeg, image/*'</span> },
+  signal: AbortSignal.timeout(<span class="s">45_000</span>),
+});
+
+<span class="u">if</span> (!(res.headers.get(<span class="s">'content-type'</span>) || <span class="s">''</span>).startsWith(<span class="s">'image/'</span>))
+  <span class="u">throw new</span> Error(<span class="s">'cold start — coba lagi'</span>);   <span class="c">// retriable</span>
+
+<span class="u">const</span> buffer = Buffer.from(await res.arrayBuffer());
+<span class="u">await</span> client.sendFile(m.chat, buffer, <span class="s">'iqc.jpg'</span>, caption, m);</pre></div>
+  </section>
+
+  <footer>
+    <span>IQC — Instagram DM Quote Card API</span>
+    <span><a href="/">Dashboard</a> · <a href="/app">Interaktif</a> · <a href="https://github.com/denllowss/iqc" target="_blank" rel="noopener">GitHub</a></span>
+  </footer>
+</div>
+
+<script>
+  // tombol salin untuk semua code block
+  document.querySelectorAll('.codeblock').forEach(function (cb) {
+    var btn = cb.querySelector('.copy');
+    if (!btn) return;
+    btn.addEventListener('click', function () {
+      var pre = cb.querySelector('pre');
+      var teks = pre ? pre.innerText : '';
+      function done() {
+        btn.textContent = '✓ Tersalin';
+        setTimeout(function () { btn.textContent = 'Salin'; }, 1600);
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(teks).then(done).catch(function () { fallback(); });
+      } else fallback();
+      function fallback() {
+        var ta = document.createElement('textarea');
+        ta.value = teks; document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); done(); } catch (e) {}
+        ta.remove();
+      }
+    });
+  });
+</script>
+</body>
+</html>
