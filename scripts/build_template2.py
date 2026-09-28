@@ -72,10 +72,18 @@ TPL2 = '''<!DOCTYPE html>
   .preview .msgtext img.apple-emoji { height: 34px; vertical-align: -7px; }
   .preview .msgtime { float: right; color: #8D8D8F; font-size: 17px;
         line-height: 20px; margin: 11px -2px -5px 12px; white-space: nowrap; }
-  .menu { width: 457px; background: rgba(49, 49, 49, 0.9); border-radius: 14px;
-        overflow: hidden; box-shadow: 0 22px 60px rgba(0, 0, 0, 0.5);
-        backdrop-filter: blur(24px) saturate(1.4);
-        -webkit-backdrop-filter: blur(24px) saturate(1.4); }
+  .menu { position: relative; width: 457px; border-radius: 16px; overflow: hidden;
+        background: linear-gradient(155deg, rgba(255,255,255,0.11), rgba(255,255,255,0.035) 38%, rgba(0,0,0,0.055)),
+                    rgba(56, 58, 60, 0.38);
+        box-shadow: 0 22px 60px rgba(0, 0, 0, 0.5),
+                    inset 0 0 0 1px rgba(255, 255, 255, 0.15),
+                    inset 0 1.5px 0.5px rgba(255, 255, 255, 0.3),
+                    inset 0 -10px 24px rgba(255, 255, 255, 0.045);
+        backdrop-filter: blur(32px) saturate(1.9) brightness(1.07);
+        -webkit-backdrop-filter: blur(32px) saturate(1.9) brightness(1.07); }
+  .menu::before { content: ''; position: absolute; inset: 0; pointer-events: none;
+        background: radial-gradient(135% 70% at 16% 0%, rgba(255,255,255,0.18), rgba(255,255,255,0.05) 45%, transparent 70%); }
+  .menu > * { position: relative; }
   .menu .row { height: 77.5px; display: flex; align-items: center;
         justify-content: space-between; padding: 0 18px 0 27px;
         font-size: 28px; color: #E8E7E5; }
