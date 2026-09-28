@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Rakit api/_template2.html (replika menu konteks WhatsApp iOS) dari api/_template.html.
 Mengambil: seluruh blok <style> (font & CSS) + blok JS emoji Apple.
-Body baru: status bar ala WA (carrier), kartu preview pesan, menu konteks 7 baris,
-latar TETAP (bukan acak), jam WIB. Idempoten — jalankan ulang kapan saja."""
+Body baru: status bar ala iOS/WA (jam putih), kartu preview pesan, menu konteks 7
+baris, latar TETAP berupa percakapan WhatsApp tema gelap yang diburamkan.
+Idempoten — jalankan ulang kapan saja."""
 import os
 
 BASE = os.path.dirname(os.path.abspath(__file__))
@@ -28,30 +29,34 @@ TPL2 = '''<!DOCTYPE html>
 <meta property="og:description" content="__PESAN_TEXT__">
 @@STYLES@@
 <style>
-  /* ====== Lingkungan luar: gelap hangat + backdrop blur senada ====== */
-  html, body { background: #0b0a09; }
+  /* ====== Lingkungan luar: latar sama, gelapkan + blur ====== */
+  html, body { background: #0b141a; }
   .backdrop { position: fixed; inset: 0; background-size: cover;
     background-position: center; background-repeat: no-repeat;
-    filter: blur(26px) brightness(0.5) saturate(0.9);
-    transform: scale(1.1); }
-  /* ====== Layout khusus iqc2 (menu konteks WhatsApp iOS) ====== */
-  .sb { position: absolute; left: 0; top: 0; width: 675px; height: 44px;
+    filter: blur(30px) brightness(0.62) saturate(0.92);
+    transform: scale(1.12); }
+  /* ====== Status bar ala iOS (WhatsApp dark) ====== */
+  .sb { position: absolute; left: 0; top: 0; width: 675px; height: 46px;
         z-index: 5; color: #fff; }
-  .sb .carrier { position: absolute; left: 12px; top: 8px; display: flex;
-        align-items: center; gap: 5px; font-size: 19px; font-weight: 600; }
-  .sb .carrier svg { width: 21px; height: 15px; }
-  .sb .time { position: absolute; left: 0; right: 0; top: 6px; text-align: center;
-        font-size: 22px; font-weight: 600; letter-spacing: 0.2px; }
-  .sb .sright { position: absolute; right: 14px; top: 9px; display: flex;
-        align-items: center; gap: 6px; font-size: 17px; font-weight: 500; }
-  .sb .sright svg.ic { width: 16px; height: 16px; }
+  .sb .carrier { position: absolute; left: 13px; top: 10px; display: flex;
+        align-items: center; gap: 6px; font-size: 19.5px; font-weight: 600;
+        color: #fff; letter-spacing: 0.1px; }
+  .sb .carrier svg { width: 22px; height: 15px; }
+  .sb .time { position: absolute; left: 0; right: 0; top: 8px; text-align: center;
+        font-size: 20.5px; font-weight: 600; letter-spacing: 0.3px;
+        color: #fff; /* jam selalu putih */ }
+  .sb .sright { position: absolute; right: 14px; top: 11px; display: flex;
+        align-items: center; gap: 6.5px; font-size: 17.5px; font-weight: 500;
+        color: #fff; }
+  .sb .sright svg.ic { width: 17px; height: 17px; }
   .batt { position: relative; width: 29px; height: 14px; }
-  .batt .case { position: absolute; inset: 0; border: 1.4px solid rgba(255,255,255,0.55);
-        border-radius: 4.2px; }
-  .batt .nub  { position: absolute; right: -3.6px; top: 4.2px; width: 2.4px; height: 5.6px;
-        background: rgba(255,255,255,0.55); border-radius: 0 2px 2px 0; }
-  .batt .lvl  { position: absolute; left: 1.7px; top: 1.7px; bottom: 1.7px;
+  .batt .case { position: absolute; inset: 0; border: 1.4px solid __BATTCOLOR__;
+        border-radius: 4.4px; }
+  .batt .nub  { position: absolute; right: -3.8px; top: 4.3px; width: 2.5px; height: 5.4px;
+        background: __BATTCOLOR__; border-radius: 0 2px 2px 0; }
+  .batt .lvl  { position: absolute; left: 1.8px; top: 1.8px; bottom: 1.8px;
         background: __BATTCOLOR__; border-radius: 2.4px; }
+  /* ====== Kartu preview + menu konteks ====== */
   #stack { position: absolute; left: 29px; bottom: 30px; width: 457px; z-index: 4;
         display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
   .preview { max-width: 446px; background: rgba(61, 61, 63, 0.98);
@@ -80,15 +85,15 @@ TPL2 = '''<!DOCTYPE html>
 
   <div class="sb">
     <div class="carrier">
-      <svg viewBox="0 0 21 15" fill="#fff"><rect x="0" y="9.5" width="3.6" height="5.5" rx="1"/><rect x="5.6" y="6.5" width="3.6" height="8.5" rx="1"/><rect x="11.2" y="3.5" width="3.6" height="11.5" rx="1"/><rect x="16.8" y="0.5" width="3.6" height="14.5" rx="1" opacity="0.35"/></svg>
+      <svg viewBox="0 0 22 15" fill="#fff"><rect x="0" y="10" width="3.5" height="5" rx="1"/><rect x="5.5" y="7.2" width="3.5" height="7.8" rx="1"/><rect x="11" y="4.2" width="3.5" height="10.8" rx="1"/><rect x="16.5" y="1" width="3.5" height="14" rx="1"/></svg>
       <span>XL Axiata LTE</span>
     </div>
     <div class="time"></div>
     <div class="sright">
-      <svg class="ic" viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="1.5"><circle cx="8" cy="8" r="6.4"/><path d="M8 4.6V8l2.4 1.6" stroke-linecap="round"/></svg>
-      <svg class="ic" viewBox="0 0 18 16" fill="none" stroke="#fff" stroke-width="1.6"><path d="M3 10v-2a6 6 0 0 1 12 0v2"/><rect x="1.6" y="9" width="3.6" height="5.4" rx="1.6"/><rect x="12.8" y="9" width="3.6" height="5.4" rx="1.6"/></svg>
+      <svg class="ic" viewBox="0 0 17 17" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round"><circle cx="8.5" cy="8.8" r="5.9"/><path d="M8.5 5.8v3.2l2.1 1.3"/><path d="M3.9 2.6L2.7 3.9M13.1 2.6l1.2 1.3"/></svg>
+      <svg class="ic" viewBox="0 0 18 17" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round"><path d="M3.2 12.5v-3a5.8 5.8 0 0 1 11.6 0v3"/><rect x="1.8" y="10.6" width="3.5" height="5.2" rx="1.7"/><rect x="12.7" y="10.6" width="3.5" height="5.2" rx="1.7"/></svg>
       <span>__BATERAI__%</span>
-      <div class="batt"><div class="case"></div><div class="lvl" style="width: calc((100% - 3.4px) * __BATTF__ + 0px);"></div><div class="nub"></div></div>
+      <div class="batt"><div class="case"></div><div class="lvl" style="width: calc((100% - 3.6px) * __BATTF__ + 0px);"></div><div class="nub"></div></div>
     </div>
   </div>
 
@@ -151,33 +156,123 @@ TPL2 = '''<!DOCTYPE html>
   tickClock();
   setInterval(tickClock, 1000);
 
-  /* ====== Latar TETAP: ruangan blur hangat (bukan acak) ====== */
+  /* ====== Latar TETAP: percakapan WhatsApp tema gelap, diburamkan kuat ======
+     Selalu percakapan yang sama (seed tetap) — bukan acak. */
   (function () {
-    var cv = document.createElement('canvas');
-    cv.width = 675; cv.height = 1200;
-    var g = cv.getContext('2d');
-    function blob(c, x, y, w, h) {
-      g.fillStyle = c; g.beginPath();
-      g.ellipse(x, y, w / 2, h / 2, 0, 0, 7); g.fill();
+    function mulberry32(a) {
+      return function () {
+        a |= 0; a = (a + 0x6D2B79F5) | 0;
+        var t = Math.imul(a ^ (a >>> 15), 1 | a);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      };
     }
-    g.fillStyle = '#241f1a'; g.fillRect(0, 0, 675, 1200);
-    g.filter = 'blur(46px)';
-    blob('#18151a', 400, 40, 660, 300);   // langit-langit gelap
-    blob('#5a4832', 140, 300, 420, 340);  // cahaya hangat kiri
-    blob('#7a6244', 500, 400, 340, 300);  // lampu tengah kanan
-    blob('#3a2f26', 90, 760, 430, 400);   // sofa/furnitur kiri
-    blob('#4a3b2c', 450, 900, 400, 360);  // meja bawah kanan
-    blob('#1a1512', 340, 1170, 600, 280); // lantai gelap
-    blob('#8f7350', 60, 120, 240, 220);   // jendela terang kiri atas
-    blob('#6f5a40', 620, 130, 220, 200);  // pantulan kanan atas
-    g.filter = 'blur(18px)';
-    blob('#a8895f', 190, 230, 96, 96);    // bokeh terang
-    blob('#8d734f', 540, 330, 80, 80);
-    blob('#7c6547', 100, 620, 110, 110);
-    blob('#8a7052', 610, 760, 92, 92);
-    blob('#6b5741', 330, 1010, 130, 130);
-    g.filter = 'none';
-    var url = cv.toDataURL('image/jpeg', 0.92);
+    var rnd = mulberry32(0x57A17A); // tetap -> latar identik tiap muat
+    var W = 675, H = 1200;
+    var off = document.createElement('canvas');
+    off.width = W; off.height = H;
+    var g = off.getContext('2d');
+
+    /* dasar: kertas chat WA gelap + dinding samar */
+    g.fillStyle = '#0B141A'; g.fillRect(0, 0, W, H);
+    var i, x, y;
+    for (i = 0; i < 90; i++) { /* doodle samar ala WA */
+      g.fillStyle = 'rgba(222,232,238,0.028)';
+      x = rnd() * W; y = rnd() * H; var r = 5 + rnd() * 16;
+      g.beginPath(); g.arc(x, y, r, 0, 7); g.fill();
+    }
+    function pill(c, px, py, pw, ph, rad) {
+      g.fillStyle = c; g.beginPath();
+      g.moveTo(px + rad, py);
+      g.arcTo(px + pw, py, px + pw, py + ph, rad);
+      g.arcTo(px + pw, py + ph, px, py + ph, rad);
+      g.arcTo(px, py + ph, px, py, rad);
+      g.arcTo(px, py, px + pw, py, rad);
+      g.closePath(); g.fill();
+    }
+    function line(lx, ly, lw, lh, c) { g.fillStyle = c; g.fillRect(lx, ly, lw, lh); }
+    function tick(tx, ty) { /* centang ganda biru */
+      g.strokeStyle = '#53BDEB'; g.lineWidth = 2.4; g.lineCap = 'round';
+      g.beginPath(); g.moveTo(tx, ty + 4); g.lineTo(tx + 4, ty + 8); g.lineTo(tx + 12, ty - 2); g.stroke();
+      g.beginPath(); g.moveTo(tx + 8, ty + 4); g.lineTo(tx + 12, ty + 8); g.lineTo(tx + 20, ty - 2); g.stroke();
+    }
+    /* pembatas tanggal (bar, tanpa teks -> deterministik) */
+    pill('#182229', (W - 170) / 2, 96, 170, 42, 10);
+    line(W / 2 - 31, 112, 62, 9, 'rgba(134,150,160,0.75)');
+
+    var IN = '#202C33', OUT = '#005C4B', TXT = 'rgba(233,237,239,0.85)', META = 'rgba(134,150,160,0.8)';
+    y = 175;
+    var turn = 0;
+    while (y < 1120) {
+      var kanan = rnd() < 0.46;
+      var bw = 190 + rnd() * 200;
+      var tipe = rnd();
+      if (tipe < 0.14) { /* foto */
+        var bh = 130 + rnd() * 90;
+        pill(kanan ? OUT : IN, kanan ? W - 44 - bw : 44, y, bw, bh, 16);
+        g.fillStyle = kanan ? 'rgba(11,20,26,0.35)' : '#2A3942';
+        g.beginPath();
+        g.moveTo(kanan ? W - 44 - bw + 14 : 58, y + bh - 14);
+        g.lineTo((kanan ? W - 44 - bw : 44) + bw * 0.45, y + 26);
+        g.lineTo((kanan ? W - 44 - bw : 44) + bw * 0.8, y + bh - 14);
+        g.closePath(); g.fill();
+        g.beginPath(); g.arc((kanan ? W - 44 - bw : 44) + bw * 0.72, y + 38, 13, 0, 7);
+        g.fillStyle = 'rgba(233,237,239,0.5)'; g.fill();
+        y += bh;
+      } else if (tipe < 0.26) { /* voice note */
+        var bh2 = 66;
+        pill(kanan ? OUT : IN, kanan ? W - 44 - 300 : 44, y, 300, bh2, 30);
+        g.fillStyle = 'rgba(233,237,239,0.55)';
+        g.beginPath(); g.arc((kanan ? W - 44 - 300 : 44) + 32, y + bh2 / 2, 12, 0, 7); g.fill();
+        g.fillStyle = kanan ? '#0B141A' : '#202C33';
+        g.beginPath();
+        var px0 = (kanan ? W - 44 - 300 : 44) + 32;
+        g.moveTo(px0 - 4, y + bh2 / 2 - 7); g.lineTo(px0 + 9, y + bh2 / 2); g.lineTo(px0 - 4, y + bh2 / 2 + 7);
+        g.closePath(); g.fill();
+        for (var wv = 0; wv < 22; wv++) {
+          var wh = 4 + rnd() * 18;
+          line((kanan ? W - 44 - 300 : 44) + 58 + wv * 10.5, y + bh2 / 2 - wh / 2, 3.5, wh,
+               kanan ? 'rgba(11,20,26,0.5)' : 'rgba(134,150,160,0.55)');
+        }
+        y += bh2;
+      } else { /* teks */
+        var lines = 1 + Math.floor(rnd() * 3);
+        var bh3 = 24 + lines * 26;
+        pill(kanan ? OUT : IN, kanan ? W - 44 - bw : 44, y, bw, bh3, 16);
+        for (var ln = 0; ln < lines; ln++) {
+          var lw2 = (bw - 40) * (ln === lines - 1 ? 0.45 + rnd() * 0.35 : 0.8 + rnd() * 0.2);
+          line((kanan ? W - 44 - bw : 44) + 20, y + 18 + ln * 26, lw2, 9, TXT);
+        }
+        var mx = (kanan ? W - 44 - bw : 44) + bw - (kanan ? 62 : 44);
+        line(mx, y + bh3 - 24, 30, 8, META);
+        if (kanan) tick(mx + 40, y + bh3 - 26);
+        y += bh3;
+      }
+      y += 14 + rnd() * 16;
+      turn++;
+    }
+    /* beberapa titik emoji samar */
+    for (i = 0; i < 12; i++) {
+      var cols = ['#F4B400', '#E5564B', '#4FAE4E', '#5B8DEF', '#F6D45C'];
+      g.fillStyle = cols[Math.floor(rnd() * cols.length)];
+      g.globalAlpha = 0.55;
+      g.beginPath(); g.arc(60 + rnd() * (W - 120), 160 + rnd() * (H - 320), 8 + rnd() * 9, 0, 7); g.fill();
+      g.globalAlpha = 1;
+    }
+
+    /* buramkan kuat (26px) seperti screenshot asli */
+    var fin = document.createElement('canvas');
+    fin.width = W; fin.height = H;
+    var fc = fin.getContext('2d');
+    var small = document.createElement('canvas');
+    small.width = W >> 3; small.height = H >> 3;
+    small.getContext('2d').drawImage(off, 0, 0, small.width, small.height);
+    fc.imageSmoothingEnabled = true; fc.imageSmoothingQuality = 'high';
+    fc.drawImage(small, 0, 0, W, H);
+    fc.filter = 'blur(9px)';
+    fc.drawImage(fin, 0, 0);
+    fc.filter = 'none';
+    var url = fin.toDataURL('image/jpeg', 0.9);
     var bg = document.querySelector('.bg');
     var bd = document.querySelector('.backdrop');
     if (bg) bg.style.backgroundImage = 'url("' + url + '")';
