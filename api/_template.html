@@ -920,7 +920,7 @@
     var g = off.getContext('2d');
     var bgEl = document.querySelector('.bg');
     var backdropEl = document.querySelector('.backdrop');
-    var WALLPAPER_BLUR = 6;
+    var WALLPAPER_BLUR = 30; /* 100%: latar hanya nuansa warna, tak terbaca */
 
     function rr(c, x, y, w, h, r) {
       r = Math.min(r, w / 2, h / 2);
@@ -1036,7 +1036,8 @@
       var fin = document.createElement('canvas'); fin.width = W; fin.height = H;
       var fc = fin.getContext('2d');
       fc.filter = 'blur(' + WALLPAPER_BLUR + 'px)';
-      fc.drawImage(off, 0, 0);
+      fc.drawImage(off, -60, -60, W + 120, H + 120); /* bentang ekstra agar tepi tak tembus */
+      fc.drawImage(off, -60, -60, W + 120, H + 120); /* lapis ganda = lebih pekat */
       fc.filter = 'none';
       var url = fin.toDataURL('image/jpeg', 0.9);
       if (bgEl) bgEl.style.backgroundImage = 'url("' + url + '")';

@@ -331,12 +331,13 @@ TPL2 = '''<!DOCTYPE html>
     g.strokeStyle = '#FFFFFF'; g.lineWidth = 3;
     g.beginPath(); g.moveTo(W - 70, iy + 62); g.quadraticCurveTo(W - 58, iy + 76, W - 46, iy + 62); g.stroke();
 
-    /* buramkan ringan (6px) — percakapan tetap terbaca jelas */
+    /* buramkan 100%: latar tinggal nuansa warna, tidak ada yang terbaca */
     var fin = document.createElement('canvas');
     fin.width = W; fin.height = H;
     var fc = fin.getContext('2d');
-    fc.filter = 'blur(6px)';
-    fc.drawImage(off, 0, 0);
+    fc.filter = 'blur(30px)';
+    fc.drawImage(off, -60, -60, W + 120, H + 120); /* bentang ekstra agar tepi tak tembus */
+    fc.drawImage(off, -60, -60, W + 120, H + 120); /* lapis ganda = lebih pekat */
     fc.filter = 'none';
     var url = fin.toDataURL('image/jpeg', 0.9);
     var bg = document.querySelector('.bg');
