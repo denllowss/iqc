@@ -908,82 +908,114 @@
      Tidak ada warna-warni & tidak ada gradien: kertas chat polos
      (terang: krem WA, gelap: #0B141A) dengan doodle garis monokrom.
      Susunan doodle diatur seed (tetap bila ?seed= dipakai). */
+  /* ====== Latar chat: percakapan Instagram — tema putih & gelap ======
+     Tema mengikuti opsi mode (terang = putih, gelap = hitam khas IG).
+     Acak tiap refresh; ?seed=12345 pada URL mengunci latar. */
   (function makeChatWallpaper() {
     var W = 675, H = 1200;
     var off = document.createElement('canvas'); off.width = W; off.height = H;
     var g = off.getContext('2d');
     var bgEl = document.querySelector('.bg');
     var backdropEl = document.querySelector('.backdrop');
+    var WALLPAPER_BLUR = 18; /* kekuatan blur latar (px) */
+
+    function rr(c, x, y, w, h, r) {
+      r = Math.min(r, w / 2, h / 2);
+      c.beginPath();
+      c.moveTo(x + r, y);
+      c.arcTo(x + w, y, x + w, y + h, r);
+      c.arcTo(x + w, y + h, x, y + h, r);
+      c.arcTo(x, y + h, x, y, r);
+      c.arcTo(x, y, x + w, y, r);
+      c.closePath();
+    }
+    function pill(x, y, w, h, rad, col) {
+      g.fillStyle = col; rr(g, x, y, w, h, rad); g.fill();
+    }
+    function baris(x, y, w, col) { g.fillStyle = col; g.fillRect(x, y, w, 9); }
 
     function render() {
       var light = !DARK;
-      g.fillStyle = light ? '#EFE7DB' : '#0B141A';
-      g.fillRect(0, 0, W, H);
-      var ink = light ? 'rgba(60,50,30,0.055)' : 'rgba(233,237,239,0.05)';
+      var BG  = light ? '#FFFFFF' : '#000000';
+      var INB = light ? '#EFEFEF' : '#262626';
+      var OUT = '#3797F0'; /* biru khas DM Instagram, sama di kedua tema */
+      var LIN = light ? 'rgba(38,38,38,0.5)'  : 'rgba(233,237,239,0.55)';
+      var LOUT = 'rgba(255,255,255,0.8)';
+      var META = light ? 'rgba(60,60,67,0.45)' : 'rgba(120,120,128,0.6)';
 
-      function heart(x, y, s) {
-        g.beginPath();
-        g.moveTo(x, y + s * 0.55);
-        g.bezierCurveTo(x - s, y - s * 0.35, x - s * 0.5, y - s, x, y - s * 0.35);
-        g.bezierCurveTo(x + s * 0.5, y - s, x + s, y - s * 0.35, x, y + s * 0.55);
-        g.stroke();
-      }
-      function star(x, y, s) {
-        g.beginPath();
-        for (var i = 0; i < 10; i++) {
-          var r = i % 2 ? s * 0.45 : s;
-          var a = -Math.PI / 2 + i * Math.PI / 5;
-          var px = x + r * Math.cos(a), py = y + r * Math.sin(a);
-          i ? g.lineTo(px, py) : g.moveTo(px, py);
+      g.fillStyle = BG; g.fillRect(0, 0, W, H);
+      var rnd = mulberry32((seed ^ 0x16C7) >>> 0);
+
+      /* pembatas waktu */
+      pill((W - 150) / 2, 70, 150, 30, 15, light ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.08)');
+      baris(W / 2 - 38, 81, 76, META);
+
+      var y = 135;
+      while (y < H - 90) {
+        var kanan = rnd() < 0.55;
+        var tipe = rnd();
+        var x = kanan ? W - 44 : 44;
+
+        if (tipe < 0.14) { /* pesan dari akun lain: avatar + gelembung */
+          var bw = 200 + rnd() * 170, bh = 30 + (1 + Math.floor(rnd() * 2)) * 24;
+          g.fillStyle = 'hsla(' + Math.floor(rnd() * 360) + ',42%,' + (light ? '58%' : '46%') + ',0.85)';
+          g.beginPath(); g.arc(64, y + bh / 2, 19, 0, 7); g.fill();
+          x = 108; bw = W - x - 100 - rnd() * 60;
+          pill(x, y, bw, bh, 21, INB);
+          for (var i = 0; i < Math.floor(bh / 24); i++)
+            baris(x + 18, y + 16 + i * 24, (bw - 60) * (0.55 + rnd() * 0.45), LIN);
+          y += bh;
+        } else if (tipe < 0.26) { /* foto dikirim */
+          var fw = 230 + rnd() * 150, fh = 150 + rnd() * 100;
+          var fx = kanan ? W - 44 - fw : 44;
+          pill(fx, y, fw, fh, 18, kanan ? (light ? '#5FA8EF' : '#2E6EA6') : (light ? '#DCD6CC' : '#3A3A3C'));
+          g.fillStyle = 'rgba(255,255,255,0.35)';
+          g.beginPath(); g.arc(fx + fw * 0.72, y + fh * 0.3, 15, 0, 7); g.fill();
+          g.fillStyle = kanan ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.15)';
+          g.beginPath();
+          g.moveTo(fx + 12, y + fh - 12); g.lineTo(fx + fw * 0.45, y + 22); g.lineTo(fx + fw - 12, y + fh - 12);
+          g.closePath(); g.fill();
+          y += fh;
+        } else if (tipe < 0.36) { /* stiker/emoji besar tanpa gelembung */
+          var cols = ['#F4B400', '#E5564B', '#4FAE4E', '#5B8DEF', '#F28AB2'];
+          var n = 1 + Math.floor(rnd() * 2);
+          for (var e = 0; e < n; e++) {
+            g.fillStyle = cols[Math.floor(rnd() * cols.length)];
+            g.beginPath();
+            g.arc(x - (kanan ? -1 : 1) * e * 52 - (kanan ? 26 : 0), y + 26, 22, 0, 7);
+            g.fill();
+          }
+          y += 56;
+        } else { /* gelembung teks */
+          var lines = 1 + Math.floor(rnd() * 3);
+          var bw2 = 170 + rnd() * 220, bh2 = 26 + lines * 24;
+          var bx = kanan ? W - 44 - bw2 : 44;
+          pill(bx, y, bw2, bh2, 21, kanan ? OUT : INB);
+          for (var l2 = 0; l2 < lines; l2++)
+            baris(bx + 18, y + 16 + l2 * 24, (bw2 - 56) * (l2 === lines - 1 ? 0.45 + rnd() * 0.4 : 0.75 + rnd() * 0.25),
+                  kanan ? LOUT : LIN);
+          if (kanan && rnd() < 0.4) { /* avatar "dilihat" */
+            g.fillStyle = 'hsla(' + Math.floor(rnd() * 360) + ',42%,' + (light ? '58%' : '46%') + ',0.85)';
+            g.beginPath(); g.arc(W - 57, y + bh2 + 24, 13, 0, 7); g.fill();
+            y += 22;
+          }
+          y += bh2;
         }
-        g.closePath(); g.stroke();
-      }
-      function bubble(x, y, s) {
-        g.beginPath(); g.arc(x, y, s, Math.PI * 0.85, Math.PI * 1.95); g.stroke();
-        g.beginPath();
-        g.moveTo(x - s * 0.75, y + s * 0.5); g.lineTo(x - s * 1.05, y + s * 1.05);
-        g.lineTo(x - s * 0.35, y + s * 0.82); g.stroke();
-      }
-      function cam(x, y, s) {
-        g.beginPath(); g.rect(x - s, y - s * 0.65, s * 2, s * 1.3); g.stroke();
-        g.beginPath(); g.arc(x, y, s * 0.42, 0, 7); g.stroke();
-        g.beginPath();
-        g.moveTo(x - s * 0.35, y - s * 0.65); g.lineTo(x - s * 0.15, y - s);
-        g.lineTo(x + s * 0.15, y - s); g.lineTo(x + s * 0.35, y - s * 0.65); g.stroke();
-      }
-      function note(x, y, s) {
-        g.beginPath();
-        g.moveTo(x, y + s * 0.6); g.lineTo(x, y - s); g.lineTo(x + s * 0.85, y - s * 0.7);
-        g.stroke();
-        g.beginPath(); g.arc(x - s * 0.18, y + s * 0.6, s * 0.28, 0, 7); g.stroke();
-      }
-      function smiley(x, y, s) {
-        g.beginPath(); g.arc(x, y, s, 0, 7); g.stroke();
-        g.beginPath(); g.arc(x - s * 0.35, y - s * 0.2, s * 0.09, 0, 7); g.fill();
-        g.beginPath(); g.arc(x + s * 0.35, y - s * 0.2, s * 0.09, 0, 7); g.fill();
-        g.beginPath(); g.arc(x, y + s * 0.1, s * 0.5, Math.PI * 0.15, Math.PI * 0.85); g.stroke();
-      }
-      function clover(x, y, s) {
-        g.beginPath(); g.arc(x - s * 0.35, y - s * 0.25, s * 0.35, 0, 7); g.stroke();
-        g.beginPath(); g.arc(x + s * 0.35, y - s * 0.25, s * 0.35, 0, 7); g.stroke();
-        g.beginPath(); g.arc(x - s * 0.35, y + s * 0.35, s * 0.35, 0, 7); g.stroke();
-        g.beginPath(); g.arc(x + s * 0.35, y + s * 0.35, s * 0.35, 0, 7); g.stroke();
-      }
-      var doodles = [heart, star, bubble, cam, note, smiley, clover];
-
-      g.strokeStyle = ink; g.fillStyle = ink;
-      g.lineWidth = 2.2; g.lineCap = 'round'; g.lineJoin = 'round';
-      var rnd = mulberry32((seed ^ 0xD00D) >>> 0);
-      var n = Math.floor(W * H / 26000);
-      for (var i = 0; i < n; i++) {
-        g.save();
-        g.translate(rnd() * W, rnd() * H);
-        g.rotate((rnd() - 0.5) * 1.2);
-        doodles[Math.floor(rnd() * doodles.length)](0, 0, 9 + rnd() * 12);
-        g.restore();
+        y += 18 + rnd() * 18;
       }
 
-      var url = off.toDataURL('image/png'); /* polos & tajam, tanpa blur */
+      /* buramkan kuat agar terasa seperti screenshot IG asli */
+      var fin = document.createElement('canvas'); fin.width = W; fin.height = H;
+      var fc = fin.getContext('2d');
+      var small = document.createElement('canvas');
+      small.width = W >> 3; small.height = H >> 3;
+      small.getContext('2d').drawImage(off, 0, 0, small.width, small.height);
+      fc.imageSmoothingEnabled = true; fc.imageSmoothingQuality = 'high';
+      fc.drawImage(small, 0, 0, W, H);
+      fc.filter = 'blur(' + WALLPAPER_BLUR + 'px)';
+      fc.drawImage(fin, 0, 0);
+      fc.filter = 'none';
+      var url = fin.toDataURL('image/jpeg', 0.9);
       if (bgEl) bgEl.style.backgroundImage = 'url("' + url + '")';
       if (backdropEl) backdropEl.style.backgroundImage = 'url("' + url + '")';
       window.__wpDone = true;
