@@ -904,343 +904,92 @@
   })();
 
 
+  /* ====== Latar chat: tema ORIGINAL WhatsApp — polos + doodle ======
+     Tidak ada warna-warni & tidak ada gradien: kertas chat polos
+     (terang: krem WA, gelap: #0B141A) dengan doodle garis monokrom.
+     Susunan doodle diatur seed (tetap bila ?seed= dipakai). */
   (function makeChatWallpaper() {
-    var rnd = mulberry32(seed);
     var W = 675, H = 1200;
     var off = document.createElement('canvas'); off.width = W; off.height = H;
-    var octx = off.getContext('2d');
-    var fin = document.createElement('canvas'); fin.width = W; fin.height = H;
-    var fctx = fin.getContext('2d');
+    var g = off.getContext('2d');
     var bgEl = document.querySelector('.bg');
-    var WALLPAPER_BLUR = 26; /* kekuatan blur latar (px) */
+    var backdropEl = document.querySelector('.backdrop');
 
-    function hsl(h, s, l, a) {
-      return 'hsla(' + ((h % 360) + 360) % 360 + ',' + s + '%,' + l + '%,' +
-             (a === undefined ? 1 : a) + ')';
-    }
-    function rr(c, x, y, w, h, r) {
-      r = Math.min(r, w / 2, h / 2);
-      c.beginPath();
-      c.moveTo(x + r, y);
-      c.arcTo(x + w, y, x + w, y + h, r);
-      c.arcTo(x + w, y + h, x, y + h, r);
-      c.arcTo(x, y + h, x, y, r);
-      c.arcTo(x, y, x + w, y, r);
-      c.closePath();
-    }
-    function blob(c, x, y, r, h, s, l, a) {
-      var g = c.createRadialGradient(x, y, 0, x, y, r);
-      g.addColorStop(0, hsl(h, s, l, a));
-      g.addColorStop(1, hsl(h, s, l, 0));
-      c.fillStyle = g;
-      c.fillRect(x - r, y - r, r * 2, r * 2);
-    }
-
-    var F  = '400 24px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif';
-    var F2 = '400 21px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif';
-
-    /* ---------- pool pesan percakapan (alur nyata, bahasa santai) ---------- */
-    var POOL = {
-      open : ['wei', 'eh halo', 'woy', 'p', 'haloo', 'bro', 'hei', 'eh ewe'],
-      q    : ['lagi apa?', 'udah makan belum?', 'besok libur gak?', 'ke mana aja lo',
-              'kok lama bales sih \uD83D\uDE2D', 'nanti jalan gak?', 'tugas udah dikumpul?',
-              'udah nonton yang baru belum?', 'bosen banget hari ini', 'btw kemarin lo ke mana?'],
-      a    : ['lagi rebahan', 'baru makan sih', 'gatau, tanya ibu', 'sibuk dikit wkwk',
-              'maaf, hp nyala mobil \uD83D\uDE4F', 'jadi dong jam 4', 'udah kok, kemarin',
-              'belom, ceritain dong', 'samaan, bosen parah', 'di rumah aja'],
-      story: ['eh tau gak, kemarin aku ketemu itu loh', 'yang katanya pindah kota',
-              'ternyata beneran loh', 'kaget banget wkwk', 'abis itu dia ngajak ngobrol',
-              'seru banget ceritanya', 'pas pulang hujan dapet \uD83D\uDE22'],
-      react: ['serius?? \uD83D\uDE31', 'wkwkwk parah', 'anjir \uD83D\uDE2D', 'gila sih',
-              'yaampun', 'omg \uD83D\uDE33', 'wah bagus dong', 'sedih banget \uD83D\uDC94',
-              'lucu banget wkwk'],
-      plan : ['besok kita jalan yuk', 'jam 4 di tempat biasa', 'ajak yang lain juga',
-              'aku beliin kopi deh', 'ditunggu ya \uD83D\uDE4F', 'jangan telat lama-lama'],
-      close: ['oke gitu, see u!', 'nanti kabarin lagi ya', 'hati-hati pulangnya',
-              'sampai ketemu besok', 'good night \uD83C\uDF19',
-              'see u, hopefully we will meet in the next life.']
-    };
-    var usedByPool = {};
-    function pick(k) {
-      var p = POOL[k], s, guard = 0;
-      do { s = p[Math.floor(rnd() * p.length)]; guard++; }
-      while (guard < 20 && usedByPool[k] === s);
-      usedByPool[k] = s;
-      return s;
-    }
-
-    var EMOJI_KEYS = ['1f602', '1f60d', '1f62d', '1f525', '1f4af', '1f64f', '1f64c',
-                      '1f389', '1f618', '1f914', '1f606', '1f973', '1f62b', '1f60a'];
-    var REACT_KEYS = ['2764-fe0f', '1f602', '1f606'];
-    var imgs = {};
-
-    /* ---------- susun alur percakapan (deterministik dari seed) ---------- */
-    var turns = [];
-    function flip() { return rnd() < 0.22 ? turns[turns.length - 1].side
-                                          : (turns[turns.length - 1].side === 'in' ? 'out' : 'in'); }
-    function push(kind, val) {
-      var s = turns.length ? flip() : (rnd() < 0.5 ? 'in' : 'out');
-      turns.push({ kind: kind, val: val, side: s });
-    }
-    push('text', pick('open'));
-    push('text', pick('q'));
-    push('text', pick('a'));
-    push('text', pick('story'));
-    push('text', pick('react'));
-    push('text', pick('story'));
-    if (rnd() < 0.5) push('emoji', nEmo());
-    push('text', pick('react'));
-    push('time', 'Hari ini ' + (19 + Math.floor(rnd() * 3)) + '.' +
-                 ('0' + (10 + Math.floor(rnd() * 49))).slice(-2));
-    push('text', pick('q'));
-    push('text', pick('a'));
-    push('text', pick('story'));
-    push('text', pick('react'));
-    if (rnd() < 0.5) push('photo');
-    if (rnd() < 0.45) push('voice');
-    push('text', pick('plan'));
-    push('text', pick('react'));
-    if (rnd() < 0.35) push('heart');
-    push('text', pick('close'));
-
-    function nEmo() { return 1 + Math.floor(rnd() * 3); }
-    /* kunci emoji utk bubble emoji & reaksi (ditentukan sekarang, konsisten saat redraw) */
-    var reactOf = {};
-    turns.forEach(function (t, i) {
-      if (t.kind === 'emoji') {
-        var ks = [];
-        for (var e = 0; e < t.val; e++)
-          ks.push(EMOJI_KEYS[Math.floor(rnd() * EMOJI_KEYS.length)]);
-        t.keys = ks;
-      }
-      if (rnd() < 0.22 && t.kind === 'text')
-        reactOf[i] = REACT_KEYS[Math.floor(rnd() * REACT_KEYS.length)];
-    });
-    if (rnd() < 0.5) reactOf[turns.length - 1] = REACT_KEYS[0];
-
-    /* ---------- helper gambar ---------- */
-    function drawBubble(x, y, w, h, out) {
-      octx.save();
-      octx.shadowColor = 'rgba(0,0,0,0.10)';
-      octx.shadowBlur = 10; octx.shadowOffsetY = 4;
-      if (out) {
-        var g = octx.createLinearGradient(x, y, x + w, y + h);
-        g.addColorStop(0, '#4F5BD5');
-        g.addColorStop(0.55, '#962FBF');
-        g.addColorStop(1, '#D62976');
-        octx.fillStyle = g;
-      } else {
-        octx.shadowColor = DARK ? 'rgba(0,0,0,0.55)' : 'rgba(0,0,0,0.22)';
-        octx.shadowBlur = 16;
-        octx.shadowOffsetY = 6;
-        octx.fillStyle = DARK ? '#262626' : '#FFFFFF';
-      }
-      rr(octx, x, y, w, h, 26);
-      octx.fill();
-      octx.restore();
-    }
-    function wrap(text, maxw) {
-      octx.font = F;
-      var words = text.split(' '), lines = [], cur = '';
-      words.forEach(function (wd) {
-        var t = cur ? cur + ' ' + wd : wd;
-        if (octx.measureText(t).width > maxw && cur) { lines.push(cur); cur = wd; }
-        else cur = t;
-      });
-      if (cur) lines.push(cur);
-      return lines;
-    }
-    function drawEmoji(k, x, y, sz) {
-      var im = imgs[k];
-      if (im) { octx.drawImage(im, x, y, sz, sz); return; }
-      var hh = 0;
-      for (var i = 0; i < k.length; i++) hh = (hh * 31 + k.charCodeAt(i)) % 360;
-      octx.fillStyle = hsl(hh, 60, 80);
-      octx.beginPath(); octx.arc(x + sz / 2, y + sz / 2, sz / 2, 0, 7); octx.fill();
-    }
-    function drawReaction(t, x, y, w, h, i) {
-      var k = reactOf[i];
-      if (!k) return;
-      var pw = 56, ph = 38;
-      var px = t.side === 'in' ? x - 8 : x + w - pw + 8;
-      var py = y + h - ph / 2;
-      octx.save();
-      octx.shadowColor = 'rgba(0,0,0,0.15)';
-      octx.shadowBlur = 8; octx.shadowOffsetY = 3;
-      octx.fillStyle = '#FFFFFF';
-      rr(octx, px, py, pw, ph, ph / 2); octx.fill();
-      octx.restore();
-      drawEmoji(k, px + 13, py + 6, 26);
-    }
-    function drawAvatar(cx, cy) {
-      octx.fillStyle = hsl(hue + 40, 55, 76);
-      octx.beginPath(); octx.arc(cx, cy, 22, 0, 7); octx.fill();
-      octx.fillStyle = 'rgba(255,255,255,0.6)';
-      octx.beginPath(); octx.arc(cx, cy - 7, 7.5, 0, 7); octx.fill();
-      octx.beginPath(); octx.arc(cx, cy + 8, 11, 0, Math.PI, true); octx.fill();
-    }
-
-    /* ---------- render percakapan lengkap ---------- */
-    var hue = Math.floor(rnd() * 360);
     function render() {
-      var c = octx;
-      var rndR = mulberry32((seed ^ 0x9E3779B9) >>> 0); /* stream render: redraw identik */
-      c.setTransform(1, 0, 0, 1, 0, 0);
-      c.clearRect(0, 0, W, H);
+      var light = !DARK;
+      g.fillStyle = light ? '#EFE7DB' : '#0B141A';
+      g.fillRect(0, 0, W, H);
+      var ink = light ? 'rgba(60,50,30,0.055)' : 'rgba(233,237,239,0.05)';
 
-      var g = c.createLinearGradient(0, 0, W, H);
-      g.addColorStop(0, hsl(hue, 34, DARK ? 15 : 86));
-      g.addColorStop(1, hsl(hue + 40, 30, DARK ? 10 : 77));
-      c.fillStyle = g; c.fillRect(0, 0, W, H);
-      blob(c, W * 0.18, H * 0.24, 400, hue,      55, DARK ? 26 : 74, DARK ? 0.5 : 0.6);
-      blob(c, W * 0.86, H * 0.64, 440, hue + 40, 58, DARK ? 22 : 68, DARK ? 0.45 : 0.55);
-      blob(c, W * 0.55, H * 0.94, 380, hue + 75, 52, DARK ? 24 : 72, 0.4);
-      blob(c, W / 2, -60, 560, hue, 30, DARK ? 10 : 98, 0.55);
-
-      var y = 66, prevSide = null, iTurn = -1, lastIn = null, lastOut = null;
-      turns.forEach(function (t) {
-        iTurn++;
-        if (t.kind === 'time') {
-          c.font = F2; c.fillStyle = DARK ? '#98989D' : '#8E9B94';
-          c.textAlign = 'center';
-          c.fillText(t.val, W / 2, y + 16);
-          c.textAlign = 'left';
-          y += 46; prevSide = null;
-          return;
-        }
-        if (t.side !== prevSide) { y += 14; prevSide = t.side; }
-
-        var x, w, h;
-        if (t.kind === 'text') {
-          var lines = wrap(t.val, 396);
-          w = 48; lines.forEach(function (L) { w = Math.max(w, c.measureText(L).width + 48); });
-          h = lines.length * 32 + 24;
-          if (y + h > H - 40) return;
-          x = t.side === 'in' ? 56 : W - 30 - w;
-          drawBubble(x, y, w, h, t.side === 'out');
-          c.font = F;
-          c.fillStyle = t.side === 'out' ? '#FFFFFF' : (DARK ? '#F5F5F5' : '#111111');
-          lines.forEach(function (L, li) {
-            c.fillText(L, x + 24, y + 40 + li * 32);
-          });
-          drawReaction(t, x, y, w, h, iTurn);
-          if (t.side === 'in') lastIn = { x: x, y: y, h: h };
-          else lastOut = y + h;
-          y += h + 12;
-        } else if (t.kind === 'emoji') {
-          w = t.keys.length * 56 + 24; h = 68;
-          if (y + h > H - 40) return;
-          x = t.side === 'in' ? 56 : W - 30 - w;
-          drawBubble(x, y, w, h, t.side === 'out');
-          t.keys.forEach(function (k, ki) { drawEmoji(k, x + 16 + ki * 56, y + 12, 44); });
-          if (t.side === 'in') lastIn = { x: x, y: y, h: h };
-          else lastOut = y + h;
-          y += h + 12;
-        } else if (t.kind === 'photo') {
-          w = 250 + Math.floor(rndR() * 70);
-          h = Math.floor(w * (1.1 + rndR() * 0.4));
-          if (y + h > H - 40) return;
-          x = t.side === 'in' ? 56 : W - 30 - w;
-          c.save();
-          c.shadowColor = 'rgba(0,0,0,0.12)';
-          c.shadowBlur = 12; c.shadowOffsetY = 4;
-          var pg = c.createLinearGradient(x, y, x + w, y + h);
-          pg.addColorStop(0, hsl(hue + rndR() * 200, 62, 62));
-          pg.addColorStop(1, hsl(hue + 60 + rndR() * 200, 58, 44));
-          c.fillStyle = pg;
-          rr(c, x, y, w, h, 24); c.fill();
-          c.restore();
-          c.fillStyle = 'rgba(255,255,255,0.5)';
-          c.beginPath(); c.arc(x + w * 0.72, y + h * 0.28, 24, 0, 7); c.fill();
-          y += h + 12;
-        } else if (t.kind === 'voice') {
-          w = 268; h = 64;
-          if (y + h > H - 40) return;
-          x = t.side === 'in' ? 56 : W - 30 - w;
-          var outv = t.side === 'out';
-          drawBubble(x, y, w, h, outv);
-          c.fillStyle = outv ? 'rgba(255,255,255,0.9)' : (DARK ? 'rgba(245,245,245,0.85)' : 'rgba(40,40,55,0.75)');
-          c.beginPath(); c.arc(x + 34, y + h / 2, 13, 0, 7); c.fill();
-          c.fillStyle = outv ? '#962FBF' : (DARK ? '#3A3A3C' : '#EFEFEF');
-          c.beginPath();
-          c.moveTo(x + 30, y + h / 2 - 6); c.lineTo(x + 40, y + h / 2);
-          c.lineTo(x + 30, y + h / 2 + 6); c.closePath(); c.fill();
-          c.fillStyle = outv ? 'rgba(255,255,255,0.85)' : (DARK ? 'rgba(245,245,245,0.65)' : 'rgba(40,40,55,0.6)');
-          for (var b = 0; b < 11; b++) {
-            var bh = 6 + rndR() * 20;
-            rr(c, x + 60 + b * 15, y + h / 2 - bh / 2, 6, bh, 3); c.fill();
-          }
-          c.font = F2; c.fillStyle = outv ? 'rgba(255,255,255,0.9)' : (DARK ? 'rgba(245,245,245,0.85)' : 'rgba(40,40,55,0.75)');
-          c.fillText('0:' + ('0' + (5 + Math.floor(rndR() * 9))).slice(-2), x + 226, y + h / 2 + 7);
-          if (outv) lastOut = y + h;
-          else lastIn = { x: x, y: y, h: h };
-          y += h + 12;
-        } else if (t.kind === 'heart') {
-          if (y + 76 > H - 40) return;
-          drawEmoji('2764-fe0f', W - 30 - 72, y, 72);
-          lastOut = y + 76;
-          y += 88;
-        }
-      });
-
-      /* avatar samping bubble masuk terakhir + status Dilihat (khas IG) */
-      if (lastIn) drawAvatar(30, lastIn.y + lastIn.h - 18);
-      if (lastOut !== null) {
-        c.font = F2; c.fillStyle = DARK ? '#98989D' : '#AEB3AF';
-        c.textAlign = 'right';
-        c.fillText('Dilihat', W - 64, Math.min(lastOut + 26, H - 12));
-        c.textAlign = 'left';
-        c.fillStyle = hsl(hue + 80, 50, 74);
-        c.beginPath(); c.arc(W - 44, Math.min(lastOut + 19, H - 19), 12, 0, 7); c.fill();
+      function heart(x, y, s) {
+        g.beginPath();
+        g.moveTo(x, y + s * 0.55);
+        g.bezierCurveTo(x - s, y - s * 0.35, x - s * 0.5, y - s, x, y - s * 0.35);
+        g.bezierCurveTo(x + s * 0.5, y - s, x + s, y - s * 0.35, x, y + s * 0.55);
+        g.stroke();
       }
-    }
-
-    /* ---------- buramkan lalu pasang sebagai latar ---------- */
-    function finalize() {
-      fctx.setTransform(1, 0, 0, 1, 0, 0);
-      fctx.clearRect(0, 0, W, H);
-      fctx.fillStyle = hsl(hue, 36, DARK ? 13 : 85);
-      fctx.fillRect(0, 0, W, H);
-      if (typeof fctx.filter === 'string') {
-        fctx.filter = 'blur(' + WALLPAPER_BLUR + 'px)';
-        fctx.drawImage(off, 0, 0);
-        fctx.filter = 'none';
-      } else {
-        var t = document.createElement('canvas');
-        t.width = W >> 3; t.height = H >> 3;
-        t.getContext('2d').drawImage(off, 0, 0, t.width, t.height);
-        fctx.imageSmoothingEnabled = true;
-        fctx.imageSmoothingQuality = 'high';
-        fctx.drawImage(t, 0, 0, W, H);
+      function star(x, y, s) {
+        g.beginPath();
+        for (var i = 0; i < 10; i++) {
+          var r = i % 2 ? s * 0.45 : s;
+          var a = -Math.PI / 2 + i * Math.PI / 5;
+          var px = x + r * Math.cos(a), py = y + r * Math.sin(a);
+          i ? g.lineTo(px, py) : g.moveTo(px, py);
+        }
+        g.closePath(); g.stroke();
       }
-      var url = fin.toDataURL('image/jpeg', 0.9);
+      function bubble(x, y, s) {
+        g.beginPath(); g.arc(x, y, s, Math.PI * 0.85, Math.PI * 1.95); g.stroke();
+        g.beginPath();
+        g.moveTo(x - s * 0.75, y + s * 0.5); g.lineTo(x - s * 1.05, y + s * 1.05);
+        g.lineTo(x - s * 0.35, y + s * 0.82); g.stroke();
+      }
+      function cam(x, y, s) {
+        g.beginPath(); g.rect(x - s, y - s * 0.65, s * 2, s * 1.3); g.stroke();
+        g.beginPath(); g.arc(x, y, s * 0.42, 0, 7); g.stroke();
+        g.beginPath();
+        g.moveTo(x - s * 0.35, y - s * 0.65); g.lineTo(x - s * 0.15, y - s);
+        g.lineTo(x + s * 0.15, y - s); g.lineTo(x + s * 0.35, y - s * 0.65); g.stroke();
+      }
+      function note(x, y, s) {
+        g.beginPath();
+        g.moveTo(x, y + s * 0.6); g.lineTo(x, y - s); g.lineTo(x + s * 0.85, y - s * 0.7);
+        g.stroke();
+        g.beginPath(); g.arc(x - s * 0.18, y + s * 0.6, s * 0.28, 0, 7); g.stroke();
+      }
+      function smiley(x, y, s) {
+        g.beginPath(); g.arc(x, y, s, 0, 7); g.stroke();
+        g.beginPath(); g.arc(x - s * 0.35, y - s * 0.2, s * 0.09, 0, 7); g.fill();
+        g.beginPath(); g.arc(x + s * 0.35, y - s * 0.2, s * 0.09, 0, 7); g.fill();
+        g.beginPath(); g.arc(x, y + s * 0.1, s * 0.5, Math.PI * 0.15, Math.PI * 0.85); g.stroke();
+      }
+      function clover(x, y, s) {
+        g.beginPath(); g.arc(x - s * 0.35, y - s * 0.25, s * 0.35, 0, 7); g.stroke();
+        g.beginPath(); g.arc(x + s * 0.35, y - s * 0.25, s * 0.35, 0, 7); g.stroke();
+        g.beginPath(); g.arc(x - s * 0.35, y + s * 0.35, s * 0.35, 0, 7); g.stroke();
+        g.beginPath(); g.arc(x + s * 0.35, y + s * 0.35, s * 0.35, 0, 7); g.stroke();
+      }
+      var doodles = [heart, star, bubble, cam, note, smiley, clover];
+
+      g.strokeStyle = ink; g.fillStyle = ink;
+      g.lineWidth = 2.2; g.lineCap = 'round'; g.lineJoin = 'round';
+      var rnd = mulberry32((seed ^ 0xD00D) >>> 0);
+      var n = Math.floor(W * H / 26000);
+      for (var i = 0; i < n; i++) {
+        g.save();
+        g.translate(rnd() * W, rnd() * H);
+        g.rotate((rnd() - 0.5) * 1.2);
+        doodles[Math.floor(rnd() * doodles.length)](0, 0, 9 + rnd() * 12);
+        g.restore();
+      }
+
+      var url = off.toDataURL('image/png'); /* polos & tajam, tanpa blur */
       if (bgEl) bgEl.style.backgroundImage = 'url("' + url + '")';
       if (backdropEl) backdropEl.style.backgroundImage = 'url("' + url + '")';
+      window.__wpDone = true;
     }
-
-    render(); finalize();   /* versi pertama (emoji sbg lingkaran lembut) */
-
-    /* Muat gambar emoji (setelah EMBEDDED_EMOJI terisi) lalu render ulang */
-    setTimeout(function () {
-      var needed = {}, pending = 0;
-      turns.forEach(function (t) {
-        if (t.kind === 'emoji') t.keys.forEach(function (k) { needed[k] = true; });
-      });
-      REACT_KEYS.forEach(function (k) { needed[k] = true; });
-      needed['2764-fe0f'] = true;
-      Object.keys(needed).forEach(function (k) {
-        var im = new Image();
-        pending++;
-        im.onload = function () {
-          pending--;
-          imgs[k] = im;
-          if (pending === 0) { render(); finalize(); window.__wpDone = true; }
-        };
-        im.src = (typeof EMBEDDED_EMOJI !== 'undefined' && EMBEDDED_EMOJI[k]) ||
-          ('https://cdn.jsdelivr.net/gh/iamcal/emoji-data/img-apple-160/' + k + '.png');
-      });
-    }, 0);
-    window.__renderWallpaper = function () { render(); finalize(); };
+    window.__renderWallpaper = render;
+    render();
   })();
 
   /* ====== Tombol ganti mode (hanya versi interaktif, disembunyikan saat render API) ====== */
