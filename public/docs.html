@@ -218,22 +218,17 @@
 
     <div class="ep"><span class="method">GET</span><code>/iqc?pesan=halo❤</code><span class="tag">utama → foto JPG</span></div>
     <div class="card">
-      <h3>Hasil: foto JPEG siap pakai</h3>
+      <h3>Hasil: selalu foto JPEG</h3>
       <p>Mengembalikan <code>image/jpeg</code> berukuran <b>1350×2400 px</b> (rasio 9:16, kualitas 92).
          Kartu dirender headless Chromium — tampilan identik dengan iPhone asli.</p>
     </div>
 
-    <div class="ep"><span class="method">GET</span><code>/iqc?...&amp;html=1</code><span class="tag">halaman interaktif</span></div>
-    <div class="card">
-      <h3>Hasil: halaman HTML (<code>text/html</code>)</h3>
-      <p>Tanpa render server — halaman dibuka langsung di browser, teks bubble bisa diedit,
-         ada tombol ganti 🌙/☀️. Cocok untuk dibagikan sebagai link.</p>
-    </div>
+    <div class="note"><span class="ic">📷</span><span><b>Selalu berupa foto.</b> Semua permintaan ke <code>/iqc</code> dan <code>/iqc2</code> menghasilkan <code>image/jpeg</code> — parameter <code>&amp;html=1</code> tidak lagi didukung (diabaikan). Bila render gagal, server tetap mengirim foto keterangan "gagal membuat gambar".</span></div>
 
     <div class="ep"><span class="method">GET</span><code>/api/iqc?pesan=...</code><span class="tag">alias langsung</span></div>
     <div class="card">
       <h3 style="margin:18px 0 2px; font-size:15px"> Menu konteks WhatsApp (v2)</h3>
-      <p class="desc" style="margin-bottom:6px"><code>/iqc2?pesan=...</code> — replika <b>menu konteks/tapback WhatsApp iOS</b>: kartu preview pesan + 7 menu (Beri Bintang, Balas, Teruskan, Salin, Balas Secara Pribadi, Chat dengan …, Hapus). Latar <b>chat WhatsApp tema gelap</b> yang diburamkan (tetap, bukan acak), <b>baterai tetap acak</b> 30–100% (deterministik bila <code>seed</code>), jam status bar putih <b>WIB</b>. Nama pengirim diubah lewat <code>&amp;name=asep</code> (default <i>Jidar</i>). Parameter <code>pesan</code>, <code>mode</code>, <code>html</code>, dan format teks WhatsApp sama seperti versi 1.</p>
+      <p class="desc" style="margin-bottom:6px"><code>/iqc2?pesan=...</code> — replika <b>menu konteks/tapback WhatsApp iOS</b>: kartu preview pesan + 7 menu (Beri Bintang, Balas, Teruskan, Salin, Balas Secara Pribadi, Chat dengan …, Hapus). Latar <b>chat WhatsApp tema gelap</b> yang diburamkan (tetap, bukan acak), <b>baterai tetap acak</b> 30–100% (deterministik bila <code>seed</code>), jam status bar putih <b>WIB</b>. Nama pengirim diubah lewat <code>&amp;name=asep</code> (default <i>Jidar</i>). Parameter <code>pesan</code>, <code>mode</code>, dan format teks WhatsApp sama seperti versi 1 — hasilnya juga selalu foto JPEG.</p>
       <h3>Endpoint function asli</h3>
       <p>Perilaku sama persis dengan <code>/iqc</code> (tanpa rewrite). Berguna bila rewrite
          dimatikan atau untuk debugging.</p>
@@ -275,18 +270,12 @@
           <td><code>Jidar</code></td>
           <td>Nama pengirim pada kartu preview <b>/iqc2</b> (maks 30 karakter), contoh <code>&amp;name=asep</code>.</td>
         </tr>
-        <tr>
-          <td><code>html</code></td>
-          <td><span class="tipe">1 | true</span></td>
-          <td><code>0</code></td>
-          <td><code>1</code> = kembalikan halaman HTML interaktif, bukan JPG.</td>
-        </tr>
       </table>
     </div>
     <div class="note"><span class="ic">ℹ️</span><span>* Secara teknis <code>pesan</code> boleh dikosongkan — server memakai teks default <i>"see u, hopefully we will meet in the next life."</i></span></div>
 
     <h3 id="format-wa" style="margin:22px 0 2px; font-size:15px">Format teks WhatsApp</h3>
-    <p class="desc">Nilai <code>pesan</code> mendukung format teks khas WhatsApp seperti saat mengetik di aplikasi. Format ini dirender di dalam bubble (mode JPG maupun <code>&amp;html=1</code>), dan tetap aman karena escaping dilakukan lebih dulu.</p>
+    <p class="desc">Nilai <code>pesan</code> mendukung format teks khas WhatsApp seperti saat mengetik di aplikasi. Format ini dirender di dalam bubble foto hasil, dan tetap aman karena escaping dilakukan lebih dulu.</p>
     <div class="card scroll">
       <table>
         <tr><th>Penulisan</th><th>Hasil</th><th>Contoh</th></tr>
@@ -362,9 +351,7 @@ r.raise_for_status()
       <table>
         <tr><th>Kasus</th><th>Status</th><th>Content-Type</th><th>Isi</th></tr>
         <tr><td>Sukses (default)</td><td><code>200</code></td><td><code>image/jpeg</code></td><td>Foto kartu 1350×2400</td></tr>
-        <tr><td>Dengan <code>html=1</code></td><td><code>200</code></td><td><code>text/html</code></td><td>Halaman interaktif</td></tr>
-        <tr><td>Render gagal (jarang)</td><td><code>200</code></td><td><code>text/html</code></td><td>Halaman fallback — link tetap bisa dibuka, bot tinggal mendeteksi content-type</td></tr>
-        <tr><td>Server error</td><td><code>500</code></td><td><code>text/plain</code></td><td>Pesan kesalahan singkat</td></tr>
+        <tr><td>Render gagal total</td><td><code>500</code></td><td><code>image/jpeg</code></td><td>Foto "gagal membuat gambar" (hasil selalu foto)</td></tr>
       </table>
     </div>
     <div class="note"><span class="ic">🌙</span><span><b>Cold start:</b> request pertama setelah idle bisa memakan 3–10 detik (Chromium harus di-init). Request berikutnya jauh lebih cepat. Untuk bot, disarankan retry 1–2x ketika respons bukan <code>image/*</code>.</span></div>
