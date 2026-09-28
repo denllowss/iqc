@@ -176,7 +176,8 @@ function bacaParams(req) {
   if (!nama) nama = 'Jidar';
   const isV2 = url.searchParams.get('v2') === '1' ||
                url.pathname.replace(/\/+$/, '').endsWith('/iqc2');
-  return { pesan, seed, mode, nama, isV2 };
+  const seedFix = /^\d+$/.test(seedQ || ''); // &seed= eksplisit -> hasil deterministik
+  return { pesan, seed, mode, nama, isV2, seedFix };
 }
 
 function buildHtml(pesan, seed, mode) {
@@ -297,8 +298,30 @@ function kirimJpg(res, jpg, status) {
   res.end(jpg);
 }
 
+/* Cache JPG in-memory: hanya utk request deterministik (&seed= eksplisit),
+   kunci menyertakan jam WIB (menit) karena jam di gambar ikut menit. */
+const jpgCache = new Map(); // key -> Buffer
+const JPG_CACHE_MAX = 40;
+function wibMenit() {
+  return new Date(Date.now() + 7 * 3600e3).toISOString().slice(0, 16); // YYYY-MM-DDTHH:MM
+}
+
 async function renderSelaluFoto(req, res) {
-  const { pesan, seed, mode, nama, isV2 } = bacaParams(req);
+  const { pesan, seed, mode, nama, isV2, seedFix } = bacaParams(req);
+  if (seedFix) {
+    const key = [isV2 ? 2 : 1, pesan, nama, seed, mode || '', wibMenit()].join('|');
+    const hit = jpgCache.get(key);
+    if (hit) { kirimJpg(res, hit, 200); return; }
+    const html = isV2 ? buildHtml2(pesan, nama, seed, mode)
+                      : buildHtml(pesan, seed, mode);
+    const jpg = await renderJpg(html);
+    jpgCache.set(key, jpg);
+    if (jpgCache.size > JPG_CACHE_MAX) {
+      jpgCache.delete(jpgCache.keys().next().value); // FIFO sederhana
+    }
+    kirimJpg(res, jpg, 200);
+    return;
+  }
   const html = isV2 ? buildHtml2(pesan, nama, seed, mode)
                     : buildHtml(pesan, seed, mode);
   const jpg = await renderJpg(html);
