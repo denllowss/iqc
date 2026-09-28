@@ -743,6 +743,10 @@
     backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
   }</style>
 <style>
+  /* ====== Semua teks memakai font iPhone (SF); Inter sbg fallback server ====== */
+  #screen { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text",
+            "SF Pro Display", "Inter", "NotoFancy", "XLang", "XTC", "XJP", "XKR",
+            "Segoe UI", Roboto, sans-serif; }
   /* ====== Lingkungan luar: latar sama, gelapkan + blur ====== */
   html, body { background: #0b141a; }
   .backdrop { position: fixed; inset: 0; background-size: cover;
@@ -763,7 +767,7 @@
         align-items: center; gap: 6.5px; font-size: 17.5px; font-weight: 500;
         color: #fff; }
   .sb .sright svg.ic { width: 17px; height: 17px; }
-  .batt { position: relative; width: 29px; height: 14px; }
+  .batt { position: relative; left: 0; top: 0; width: 29px; height: 14px; }
   .batt .case { position: absolute; inset: 0; border: 1.4px solid __BATTCOLOR__;
         border-radius: 4.4px; }
   .batt .nub  { position: absolute; right: -3.8px; top: 4.3px; width: 2.5px; height: 5.4px;
@@ -782,8 +786,10 @@
   .preview .msgtext img.apple-emoji { height: 27px; vertical-align: -5px; }
   .preview .msgtime { text-align: right; color: #7D7D7F; font-size: 19px;
         margin-top: 3px; line-height: 26px; }
-  .menu { width: 457px; background: #313131; border-radius: 14px; overflow: hidden;
-        box-shadow: 0 22px 60px rgba(0, 0, 0, 0.5); }
+  .menu { width: 457px; background: rgba(49, 49, 49, 0.9); border-radius: 14px;
+        overflow: hidden; box-shadow: 0 22px 60px rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(24px) saturate(1.4);
+        -webkit-backdrop-filter: blur(24px) saturate(1.4); }
   .menu .row { height: 77.5px; display: flex; align-items: center;
         justify-content: space-between; padding: 0 18px 0 27px;
         font-size: 27px; color: #E8E7E5; }
@@ -974,17 +980,12 @@
       g.globalAlpha = 1;
     }
 
-    /* buramkan kuat (26px) seperti screenshot asli */
+    /* buramkan secukupnya (12px) — bubble tetap jelas terlihat */
     var fin = document.createElement('canvas');
     fin.width = W; fin.height = H;
     var fc = fin.getContext('2d');
-    var small = document.createElement('canvas');
-    small.width = W >> 3; small.height = H >> 3;
-    small.getContext('2d').drawImage(off, 0, 0, small.width, small.height);
-    fc.imageSmoothingEnabled = true; fc.imageSmoothingQuality = 'high';
-    fc.drawImage(small, 0, 0, W, H);
-    fc.filter = 'blur(9px)';
-    fc.drawImage(fin, 0, 0);
+    fc.filter = 'blur(12px)';
+    fc.drawImage(off, 0, 0);
     fc.filter = 'none';
     var url = fin.toDataURL('image/jpeg', 0.9);
     var bg = document.querySelector('.bg');
