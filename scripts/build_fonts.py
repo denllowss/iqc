@@ -46,6 +46,16 @@ MICRO = [
     ('NotoSansCanadianAboriginal','1400-167F,18B0-18F5'),
     ('NotoSansYi',                'A000-A4C6'),
     ('NotoSerifTibetan',          '0F00-0FFF'),
+    ('NotoSansSyriacEastern',     '0700-074F'),
+    ('NotoSansTagalog',           '1700-171F,1735-1736'),
+    ('NotoSansTagbanwa',          '1760-177F'),
+    ('NotoSansLimbu',             '1900-194F'),
+    ('NotoSansBuginese',          '1A00-1A1F'),
+    ('NotoSansTaiTham',           '1A20-1AAF'),
+    ('NotoSansSundanese',         '1B80-1BBF,1CC0-1CCF'),
+    ('NotoSansCham',              'AA00-AA5F'),
+    ('NotoSansMeeteiMayek',       'ABC0-ABFF,AAE0-AAF6'),
+    ('NotoSansWarangCiti',        '118A0-118FF'),
     ('NotoSansTaiLe',             '1950-197F'),
     ('NotoSansTaiViet',           'AA80-AADF'),
     ('NotoSansNewTaiLue',         '1980-19DF'),
@@ -64,11 +74,13 @@ MICRO = [
 ]
 
 SUBSETS = {
-    'NotoSansMath':    '20DD-20E0,2100-214F,2200-22FF,1D400-1D7FF',
+    'NotoSansMath':    '20D0-20E0,2100-214F,2200-22FF,2A00-2AFF,1D400-1D7FF',
     'NotoSansSymbols': '20E0-20E3,2460-24FF,2B00-2BFF,1F100-1F1E5',
     'NotoSansSymbols2':'2600-26FF,2700-27BF',
+    'NotoSans':        '0300-036F,2E00-2E7F,AB30-AB6F',
 }
 DEJAVU_UNI = '0300-036F,0488-0489,1D00-1D7F,2070-209F,2190-21FF,2300-23FF,2500-25FF,2B00-2BFF,FB1D-FB4F,FB50-FDFF,FE70-FEFF'
+DEJAVU_UNI2 = '0370-0377,037B-037F,1F00-1FFF,2100-214F,2C60-2C7F,2600-26FF,2700-27BF,A720-A7FF'
 NOTO_EMOJI_UNI = '1F1E6-1F1FF'
 
 # fontsource inter subsets (sudah woff2, langsung embed)
@@ -85,7 +97,7 @@ INTER_RANGE = {
 }
 # font bahasa via CDN (lazy, unicode-range)
 CDN = [
-    ('noto-sans-devanagari', 'devanagari',  'U+0900-097F,U+A8E0-A8FF'),
+    ('noto-sans-devanagari', 'devanagari',  'U+0900-097F,U+A830-A83F,U+A8E0-A8FF'),
     ('noto-sans-bengali',    'bengali',     'U+0980-09FF'),
     ('noto-sans-gurmukhi',   'gurmukhi',    'U+0A00-0A7F'),
     ('noto-sans-gujarati',   'gujarati',    'U+0A80-0AFF'),
@@ -152,7 +164,7 @@ css = []
 rep = []
 
 # ---------- 1-2) subset Noto + DejaVu (urutan menentukan prioritas klaim) ----------
-ORDER = [('DejaVuSans', DEJAVU_UNI)] + list(SUBSETS.items())
+ORDER = list(SUBSETS.items()) + [('DejaVuSans', DEJAVU_UNI), ('DejaVuSans', DEJAVU_UNI2)]
 for fam, uni in ORDER:
     if fam == 'DejaVuSans':
         p = fetch(f'{FS}/dejavu-fonts-ttf@2.37.3/ttf/DejaVuSans.ttf', 'DejaVuSans.ttf')
@@ -177,6 +189,12 @@ p = fetch('https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/notoemoji/NotoEmoji
           'NotoEmoji-var.ttf')
 data = subset_ttf(p, parse_uni_list(NOTO_EMOJI_UNI))
 face_css('NotoFancy', data, 'RI-emoji')
+
+# ---------- 3c) Hangul jamo (subset dari Noto Sans KR variable) ----------
+p = fetch('https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/notosanskr/NotoSansKR%5Bwght%5D.ttf',
+          'NotoSansKR-var.ttf')
+data = subset_ttf(p, parse_uni_list('1100-11FF,A960-A97F,D7B0-D7FF'))
+face_css('NotoFancy', data, 'HangulJamo')
 
 # ---------- 4) Inter subsets ----------
 for slug, w in INTER:
