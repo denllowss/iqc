@@ -1,12 +1,18 @@
 {
   "cleanUrls": true,
   "rewrites": [
-    { "source": "/iqc", "destination": "/api/iqc" },
-    { "source": "/iqc/", "destination": "/api/iqc" }
+    {
+      "source": "/iqc",
+      "destination": "/api/iqc"
+    },
+    {
+      "source": "/iqc/",
+      "destination": "/api/iqc"
+    }
   ],
   "functions": {
     "api/iqc.js": {
-      "includeFiles": "api/_template.html",
+      "includeFiles": "_template.html",
       "memory": 2048,
       "maxDuration": 60
     }
