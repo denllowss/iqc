@@ -50,15 +50,18 @@ function bacaParams(req) {
   const seed = /^\d+$/.test(seedQ || '') ? parseInt(seedQ, 10) >>> 0
              : (Math.random() * 4294967296) >>> 0;
   const htmlMode = ['1', 'true'].includes((url.searchParams.get('html') || '').toLowerCase());
-  return { pesan, seed, htmlMode };
+  const modeQ = (url.searchParams.get('mode') || '').toLowerCase();
+  const mode = modeQ === 'dark' ? 'dark' : modeQ === 'light' ? 'light' : null;
+  return { pesan, seed, htmlMode, mode };
 }
 
-function buildHtml(pesan, seed) {
+function buildHtml(pesan, seed, mode) {
   const safe = esc(pesan).replace(/\r?\n/g, '<br>');
   let html = getTemplate().split('__PESAN__').join(safe);
-  // injeksi seed agar wallpaper deterministik saat dirender headless
+  // injeksi seed + mode agar hasil deterministik saat dirender headless
   html = html.replace('<body>',
-    '<body><script>window.__SEED=' + seed + ';</script>');
+    '<body><script>window.__SEED=' + seed + ';' +
+    (mode ? 'window.__MODE="' + mode + '";' : '') + '</script>');
   return html;
 }
 
@@ -93,13 +96,14 @@ async function renderJpg(html) {
     // muat halaman; tunggu jaringan selesai (emoji CDN) — kalau timeout lanjut saja
     await page.setContent(html, { waitUntil: 'networkidle0', timeout: 30000 })
       .catch(() => {});
-    // pastikan wallpaper canvas & emoji bubble siap
+    // pastikan wallpaper final (render ulang setelah emoji termuat) & emoji bubble siap
     await page.waitForFunction(() => {
       const bg = document.querySelector('.bg');
       const imgs = document.querySelectorAll('#msg img.apple-emoji');
-      return !!bg && bg.style.backgroundImage.length > 60 &&
+      return window.__wpDone === true &&
+             !!bg && bg.style.backgroundImage.length > 60 &&
              Array.prototype.every.call(imgs, function (i) { return i.complete; });
-    }, { timeout: 15000 }).catch(() => {});
+    }, { timeout: 20000 }).catch(() => {});
     await new Promise((r) => setTimeout(r, 900)); // buffer render akhir + encode JPEG
 
     const buf = await page.screenshot({ type: 'jpeg', quality: 92, fullPage: false });
@@ -111,8 +115,8 @@ async function renderJpg(html) {
 
 module.exports = async (req, res) => {
   try {
-    const { pesan, seed, htmlMode } = bacaParams(req);
-    const html = buildHtml(pesan, seed);
+    const { pesan, seed, htmlMode, mode } = bacaParams(req);
+    const html = buildHtml(pesan, seed, mode);
 
     // mode halaman interaktif
     if (htmlMode) return kirimHtml(res, html, 0);

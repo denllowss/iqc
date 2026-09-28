@@ -179,7 +179,37 @@
   .ic-forward { left: 181.25px; top: 18px; }
   .ic-copy    { left: 182px;    top: 17px; }
   .ic-report  { left: 181px;    top: 17.5px; }
-</style>
+
+  /* ================= DARK MODE ================= */
+  body.dark { background: #101013; }
+  body.dark .backdrop::after { background: rgba(0,0,0,0.55); }
+  .dark .time, .dark .lte { color: #fff; }
+  .dark .sig  rect[fill="#000"]    { fill: #fff; }
+  .dark .sig  rect[fill="#b8b8b8"] { fill: rgba(255,255,255,0.35); }
+  .dark .batt rect[fill="#000"]    { fill: #fff; }
+  .dark .batt rect[stroke="rgba(0,0,0,0.42)"] { stroke: rgba(255,255,255,0.45); }
+  .dark .batt rect[fill="rgba(0,0,0,0.45)"]   { fill: rgba(255,255,255,0.45); }
+  .dark .pill  { background: #1C1C1E; box-shadow: 0 12px 32px rgba(0,0,0,0.55), 0 4px 12px rgba(0,0,0,0.35); }
+  .dark .cap   { color: #98989D; }
+  .dark .plus g{ stroke: #A5A5AA; }
+  .dark .bubble{ background: #262626; color: #fff;
+                 box-shadow: 0 10px 28px rgba(0,0,0,0.5), 0 3px 10px rgba(0,0,0,0.3); }
+  .dark .menu  { background: #262626; box-shadow: 0 12px 36px rgba(0,0,0,0.6), 0 4px 14px rgba(0,0,0,0.35); }
+  .dark .row + .row { border-top: 1px solid rgba(255,255,255,0.12); }
+  .dark .lbl   { color: #fff; }
+  .dark .lbl.red { color: #FF3040; }
+  .dark .ic-reply g, .dark .ic-forward g, .dark .ic-copy g { stroke: #fff; }
+  .dark .ic-copy path[fill="#f6f6f6"] { fill: #262626; }
+  .dark .ic-report path, .dark .ic-report rect, .dark .ic-report circle
+                               { stroke: #FF3040; fill: #FF3040; }
+  .dark .ic-report path[fill="none"]  { fill: none; }
+  .mode-toggle {
+    position: absolute; right: 14px; bottom: 14px; z-index: 10;
+    width: 54px; height: 54px; border-radius: 50%; border: none;
+    cursor: pointer; font-size: 26px; line-height: 1;
+    background: rgba(120,120,128,0.32);
+    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  }</style>
 </head>
 <body>
 <div class="backdrop"></div>
@@ -317,6 +347,22 @@
     var mSeed = location.search.match(/[?&]seed=(\d+)/);
     seed = mSeed ? parseInt(mSeed[1], 10) : (Math.random() * 4294967296) >>> 0;
   }
+  /* ====== Mode terang/gelap (dark mode) ====== */
+  var DARK = (typeof window.__MODE === 'string')
+    ? window.__MODE === 'dark'
+    : (location.search.match(/[?&]mode=(dark|light)/) || [])[1] === 'dark';
+  var bodyEl = document.body;
+  function applyMode() {
+    bodyEl.classList.toggle('dark', DARK);
+    document.getElementById('screen').classList.toggle('dark', DARK);
+  }
+  function setMode(dark, persist) {
+    DARK = dark;
+    applyMode();
+    if (window.__renderWallpaper) window.__renderWallpaper();
+    if (persist) { try { localStorage.setItem('iqc-mode', dark ? 'dark' : 'light'); } catch (e) {} }
+  }
+
   /* ====== Baterai status bar: acak 30%-100% (deterministik jika seed diset) ====== */
   (function () {
     var pct = 30 + Math.floor(mulberry32((seed ^ 0xBA77) >>> 0)() * 71); /* 30..100 */
@@ -455,10 +501,10 @@
         g.addColorStop(1, '#D62976');
         octx.fillStyle = g;
       } else {
-        octx.shadowColor = 'rgba(0,0,0,0.22)';
+        octx.shadowColor = DARK ? 'rgba(0,0,0,0.55)' : 'rgba(0,0,0,0.22)';
         octx.shadowBlur = 16;
         octx.shadowOffsetY = 6;
-        octx.fillStyle = '#FFFFFF';
+        octx.fillStyle = DARK ? '#262626' : '#FFFFFF';
       }
       rr(octx, x, y, w, h, 26);
       octx.fill();
@@ -514,19 +560,19 @@
       c.clearRect(0, 0, W, H);
 
       var g = c.createLinearGradient(0, 0, W, H);
-      g.addColorStop(0, hsl(hue, 36, 86));
-      g.addColorStop(1, hsl(hue + 40, 34, 77));
+      g.addColorStop(0, hsl(hue, 34, DARK ? 15 : 86));
+      g.addColorStop(1, hsl(hue + 40, 30, DARK ? 10 : 77));
       c.fillStyle = g; c.fillRect(0, 0, W, H);
-      blob(c, W * 0.18, H * 0.24, 400, hue,      55, 74, 0.6);
-      blob(c, W * 0.86, H * 0.64, 440, hue + 40, 58, 68, 0.55);
-      blob(c, W * 0.55, H * 0.94, 380, hue + 75, 52, 72, 0.4);
-      blob(c, W / 2, -60, 560, hue, 30, 98, 0.55);
+      blob(c, W * 0.18, H * 0.24, 400, hue,      55, DARK ? 26 : 74, DARK ? 0.5 : 0.6);
+      blob(c, W * 0.86, H * 0.64, 440, hue + 40, 58, DARK ? 22 : 68, DARK ? 0.45 : 0.55);
+      blob(c, W * 0.55, H * 0.94, 380, hue + 75, 52, DARK ? 24 : 72, 0.4);
+      blob(c, W / 2, -60, 560, hue, 30, DARK ? 10 : 98, 0.55);
 
       var y = 66, prevSide = null, iTurn = -1, lastIn = null, lastOut = null;
       turns.forEach(function (t) {
         iTurn++;
         if (t.kind === 'time') {
-          c.font = F2; c.fillStyle = '#8E9B94';
+          c.font = F2; c.fillStyle = DARK ? '#98989D' : '#8E9B94';
           c.textAlign = 'center';
           c.fillText(t.val, W / 2, y + 16);
           c.textAlign = 'left';
@@ -544,7 +590,7 @@
           x = t.side === 'in' ? 56 : W - 30 - w;
           drawBubble(x, y, w, h, t.side === 'out');
           c.font = F;
-          c.fillStyle = t.side === 'out' ? '#FFFFFF' : '#111111';
+          c.fillStyle = t.side === 'out' ? '#FFFFFF' : (DARK ? '#F5F5F5' : '#111111');
           lines.forEach(function (L, li) {
             c.fillText(L, x + 24, y + 40 + li * 32);
           });
@@ -584,18 +630,18 @@
           x = t.side === 'in' ? 56 : W - 30 - w;
           var outv = t.side === 'out';
           drawBubble(x, y, w, h, outv);
-          c.fillStyle = outv ? 'rgba(255,255,255,0.9)' : 'rgba(40,40,55,0.75)';
+          c.fillStyle = outv ? 'rgba(255,255,255,0.9)' : (DARK ? 'rgba(245,245,245,0.85)' : 'rgba(40,40,55,0.75)');
           c.beginPath(); c.arc(x + 34, y + h / 2, 13, 0, 7); c.fill();
-          c.fillStyle = outv ? '#962FBF' : '#EFEFEF';
+          c.fillStyle = outv ? '#962FBF' : (DARK ? '#3A3A3C' : '#EFEFEF');
           c.beginPath();
           c.moveTo(x + 30, y + h / 2 - 6); c.lineTo(x + 40, y + h / 2);
           c.lineTo(x + 30, y + h / 2 + 6); c.closePath(); c.fill();
-          c.fillStyle = outv ? 'rgba(255,255,255,0.85)' : 'rgba(40,40,55,0.6)';
+          c.fillStyle = outv ? 'rgba(255,255,255,0.85)' : (DARK ? 'rgba(245,245,245,0.65)' : 'rgba(40,40,55,0.6)');
           for (var b = 0; b < 11; b++) {
             var bh = 6 + rndR() * 20;
             rr(c, x + 60 + b * 15, y + h / 2 - bh / 2, 6, bh, 3); c.fill();
           }
-          c.font = F2; c.fillStyle = outv ? 'rgba(255,255,255,0.9)' : 'rgba(40,40,55,0.75)';
+          c.font = F2; c.fillStyle = outv ? 'rgba(255,255,255,0.9)' : (DARK ? 'rgba(245,245,245,0.85)' : 'rgba(40,40,55,0.75)');
           c.fillText('0:' + ('0' + (5 + Math.floor(rndR() * 9))).slice(-2), x + 226, y + h / 2 + 7);
           if (outv) lastOut = y + h;
           else lastIn = { x: x, y: y, h: h };
@@ -611,7 +657,7 @@
       /* avatar samping bubble masuk terakhir + status Dilihat (khas IG) */
       if (lastIn) drawAvatar(30, lastIn.y + lastIn.h - 18);
       if (lastOut !== null) {
-        c.font = F2; c.fillStyle = '#AEB3AF';
+        c.font = F2; c.fillStyle = DARK ? '#98989D' : '#AEB3AF';
         c.textAlign = 'right';
         c.fillText('Dilihat', W - 64, Math.min(lastOut + 26, H - 12));
         c.textAlign = 'left';
@@ -624,7 +670,7 @@
     function finalize() {
       fctx.setTransform(1, 0, 0, 1, 0, 0);
       fctx.clearRect(0, 0, W, H);
-      fctx.fillStyle = hsl(hue, 36, 85);
+      fctx.fillStyle = hsl(hue, 36, DARK ? 13 : 85);
       fctx.fillRect(0, 0, W, H);
       if (typeof fctx.filter === 'string') {
         fctx.filter = 'blur(' + WALLPAPER_BLUR + 'px)';
@@ -659,13 +705,37 @@
         im.onload = function () {
           pending--;
           imgs[k] = im;
-          if (pending === 0) { render(); finalize(); }
+          if (pending === 0) { render(); finalize(); window.__wpDone = true; }
         };
         im.src = (typeof EMBEDDED_EMOJI !== 'undefined' && EMBEDDED_EMOJI[k]) ||
           ('https://cdn.jsdelivr.net/gh/iamcal/emoji-data/img-apple-160/' + k + '.png');
       });
     }, 0);
+    window.__renderWallpaper = function () { render(); finalize(); };
   })();
+
+  /* ====== Tombol ganti mode (hanya versi interaktif, disembunyikan saat render API) ====== */
+  if (typeof window.__SEED !== 'number') {
+    if (typeof window.__MODE !== 'string' &&
+        !/[?&]mode=(dark|light)/.test(location.search)) {
+      var savedMode = null;
+      try { savedMode = localStorage.getItem('iqc-mode'); } catch (e) {}
+      if (savedMode === 'dark') DARK = true;
+      else if (savedMode !== 'light' && window.matchMedia &&
+               matchMedia('(prefers-color-scheme: dark)').matches) DARK = true;
+    }
+    var modeBtn = document.createElement('button');
+    modeBtn.className = 'mode-toggle';
+    modeBtn.title = 'Ganti mode terang/gelap';
+    modeBtn.textContent = DARK ? '\u2600\uFE0F' : '\uD83C\uDF19';
+    modeBtn.addEventListener('click', function () {
+      setMode(!DARK, true);
+      modeBtn.textContent = DARK ? '\u2600\uFE0F' : '\uD83C\uDF19';
+    });
+    document.body.appendChild(modeBtn);
+  }
+  try { applyMode(); window.__renderWallpaper(); } catch (e) {} /* render ulang wallpaper sesuai mode */
+
 
   function fit() {
     var vv = window.visualViewport;

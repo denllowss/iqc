@@ -6,15 +6,17 @@ blur acak, jam WIB otomatis). Siap deploy ke **Vercel**.
 ## Contoh
 
 ```
-https://domain.com/iqc?pesan=halo❤        -> foto JPG (1350x2400, rasio 9:16)
+https://domain.com/iqc?pesan=halo❤        -> foto JPG mode terang (1350x2400, rasio 9:16)
+https://domain.com/iqc?pesan=halo❤&mode=dark -> foto JPG DARK MODE (Instagram gelap)
 https://domain.com/iqc?pesan=miss you😭   -> foto JPG, wallpaper acak
-https://domain.com/iqc?pesan=halo&seed=42 -> foto JPG, wallpaper terkunci (identik)
+https://domain.com/iqc?pesan=halo&seed=42 -> foto JPG, wallpaper & baterai terkunci (identik)
 https://domain.com/iqc?pesan=halo&html=1  -> halaman interaktif (HTML, bukan JPG)
 ```
 
 | Parameter | Keterangan |
 |---|---|
 | `pesan` | Isi bubble chat. Mendukung emoji (dirender sebagai emoji Apple/iPhone), maks. 1000 karakter, aman dari XSS, baris baru diizinkan. |
+| `mode` | `mode=dark` untuk dark mode (UI gelap + wallpaper percakapan gelap). `mode=light` memaksa terang. Tanpa parameter: terang (versi interaktif mengikuti preferensi sistem, ada tombol 🌙/☀️ untuk ganti). |
 | `seed` | (Opsional) Angka — wallpaper **dan level baterai (30–100%)** jadi deterministik/identik. Tanpa `seed`, tiap request menghasilkan wallpaper & baterai berbeda. |
 | `html` | `html=1` untuk mendapat halaman HTML interaktif (teks bisa diedit) alih-alih JPG. |
 
